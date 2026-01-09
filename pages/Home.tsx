@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Property, SearchFilters } from '../types';
 // import { MOCK_PROPERTIES } from '../constants'; // Deprecated
 import { supabase } from '../lib/supabaseClient';
@@ -10,6 +10,7 @@ import CompactPropertyCard from '../components/CompactPropertyCard';
 
 const Home: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [filters, setFilters] = useState<SearchFilters>({
         query: '',
         type: '',
@@ -18,6 +19,15 @@ const Home: React.FC = () => {
     });
     // const [selectedProperty, setSelectedProperty] = useState<Property | null>(null); // Removed
     const [properties, setProperties] = useState<Property[]>([]);
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const q = params.get('q') || '';
+        const type = params.get('type') || '';
+        if (q || type) {
+            setFilters(prev => ({ ...prev, query: q, type: type }));
+        }
+    }, [location.search]);
 
     useEffect(() => {
         fetchProperties();
@@ -52,7 +62,9 @@ const Home: React.FC = () => {
                 orientation: d.orientation,
                 certificate: d.certificate,
                 furniture: d.furniture,
-                yearBuilt: d.year_built
+                yearBuilt: d.year_built,
+                mapUrl: d.map_url,
+                nearbyAccess: d.nearby_access
             }));
             setProperties(mapped);
         }
@@ -60,8 +72,19 @@ const Home: React.FC = () => {
 
     const filteredProperties = useMemo(() => {
         return properties.filter(p => {
-            const matchQuery = p.title.toLowerCase().includes(filters.query.toLowerCase()) ||
-                p.location.toLowerCase().includes(filters.query.toLowerCase());
+            const queryTerms = filters.query.toLowerCase().trim().split(/\s+/);
+            const searchableText = `
+                ${p.title} 
+                ${p.location} 
+                ${p.description} 
+                ${p.type} 
+                ${p.nearbyAccess || ''}
+            `.toLowerCase();
+
+            // Check if ALL search terms are present in the searchable text (AND logic)
+            // or if the query is empty
+            const matchQuery = queryTerms.length === 0 || queryTerms.every(term => searchableText.includes(term));
+
             const matchType = filters.type ? p.type === filters.type : true;
             const matchMaxPrice = filters.maxPrice ? p.price <= parseInt(filters.maxPrice) : true;
             return matchQuery && matchType && matchMaxPrice;

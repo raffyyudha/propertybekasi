@@ -22,7 +22,12 @@ const Navbar: React.FC = () => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Searching for:', searchQuery, 'Type:', searchType);
+    const params = new URLSearchParams();
+    if (searchQuery) params.set('q', searchQuery);
+    if (searchType && searchType !== 'Semua') params.set('type', searchType);
+
+    navigate(`/?${params.toString()}`);
+    setMobileMenuOpen(false);
   };
 
   return (
