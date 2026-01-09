@@ -75,7 +75,9 @@ const PropertyManager: React.FC = () => {
             furniture: currentProperty.furniture,
             year_built: Number(currentProperty.year_built || currentProperty.yearBuilt || new Date().getFullYear()),
             is_featured: currentProperty.is_featured || false,
-            is_promo: currentProperty.is_promo || false
+            is_promo: currentProperty.is_promo || false,
+            map_url: currentProperty.mapUrl || currentProperty.map_url,
+            nearby_access: currentProperty.nearbyAccess || currentProperty.nearby_access
         };
 
         // Remove undefined keys
@@ -376,6 +378,30 @@ const PropertyManager: React.FC = () => {
                                             <option value="Full Furnished">Full Furnished</option>
                                         </select>
                                     </div>
+                                </div>
+                            </div>
+
+                            <div className="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                                <div>
+                                    <label className="block text-sm font-bold text-slate-700 mb-1">Google Maps Embed URL</label>
+                                    <input
+                                        type="text"
+                                        value={currentProperty.mapUrl || (currentProperty as any).map_url || ''}
+                                        onChange={(e) => setCurrentProperty({ ...currentProperty, mapUrl: e.target.value })}
+                                        className="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                        placeholder="https://www.google.com/maps/embed?..."
+                                    />
+                                    <p className="text-[10px] text-slate-400 mt-1">Paste link dari menu 'Embed a map' di Google Maps</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-slate-700 mb-1">Akses Terdekat</label>
+                                    <textarea
+                                        value={currentProperty.nearbyAccess || (currentProperty as any).nearby_access || ''}
+                                        onChange={(e) => setCurrentProperty({ ...currentProperty, nearbyAccess: e.target.value })}
+                                        className="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all text-sm"
+                                        rows={3}
+                                        placeholder="Contoh:&#10;Stasiun KRL Cicayur: 2.5km&#10;Aeon Mall: 5km"
+                                    />
                                 </div>
                             </div>
 

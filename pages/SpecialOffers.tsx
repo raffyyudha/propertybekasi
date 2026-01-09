@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { Property } from '../types';
 import CompactPropertyCard from '../components/CompactPropertyCard';
-import PropertyModal from '../components/PropertyModal';
 
 
 const SpecialOffers: React.FC = () => {
     // const promoProperties = MOCK_PROPERTIES.filter(p => p.isPromo);
+    const navigate = useNavigate();
     const [promoProperties, setPromoProperties] = useState<Property[]>([]);
 
     useEffect(() => {
@@ -47,7 +48,7 @@ const SpecialOffers: React.FC = () => {
             setPromoProperties(mapped);
         }
     };
-    const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+    // const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
 
     return (
         <div className="pt-28 pb-40 min-h-screen bg-slate-50">
@@ -67,7 +68,7 @@ const SpecialOffers: React.FC = () => {
                             <CompactPropertyCard
                                 key={property.id}
                                 property={property}
-                                onClick={() => setSelectedProperty(property)}
+                                onClick={() => navigate(`/property/${property.id}`)}
                             />
                         ))}
                     </div>
@@ -78,13 +79,6 @@ const SpecialOffers: React.FC = () => {
                     </div>
                 )}
             </div>
-
-            {selectedProperty && (
-                <PropertyModal
-                    property={selectedProperty}
-                    onClose={() => setSelectedProperty(null)}
-                />
-            )}
         </div>
     );
 };

@@ -29,6 +29,8 @@ export interface Property {
   description: string;
   isFeatured?: boolean;
   isPromo?: boolean;
+  mapUrl?: string; // Google Maps Embed URL
+  nearbyAccess?: string; // Multiline text for nearby access points
 }
 
 export interface SearchFilters {

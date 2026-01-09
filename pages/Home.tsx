@@ -1,21 +1,22 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Property, SearchFilters } from '../types';
 // import { MOCK_PROPERTIES } from '../constants'; // Deprecated
 import { supabase } from '../lib/supabaseClient';
 import Hero from '../components/Hero';
 import PropertyCard from '../components/PropertyCard';
 import CompactPropertyCard from '../components/CompactPropertyCard';
-import PropertyModal from '../components/PropertyModal';
 
 const Home: React.FC = () => {
+    const navigate = useNavigate();
     const [filters, setFilters] = useState<SearchFilters>({
         query: '',
         type: '',
         minPrice: '',
         maxPrice: ''
     });
-    const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+    // const [selectedProperty, setSelectedProperty] = useState<Property | null>(null); // Removed
     const [properties, setProperties] = useState<Property[]>([]);
 
     useEffect(() => {
@@ -100,7 +101,7 @@ const Home: React.FC = () => {
                             <CompactPropertyCard
                                 key={property.id}
                                 property={property}
-                                onClick={() => setSelectedProperty(property)}
+                                onClick={() => navigate(`/property/${property.id}`)}
                             />
                         ))}
                     </div>
@@ -191,13 +192,6 @@ const Home: React.FC = () => {
                     </div>
                 </div>
             </section>
-
-            {selectedProperty && (
-                <PropertyModal
-                    property={selectedProperty}
-                    onClose={() => setSelectedProperty(null)}
-                />
-            )}
         </>
     );
 };

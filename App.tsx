@@ -12,6 +12,7 @@ import Login from './pages/Admin/Login';
 import AdminLayout from './pages/Admin/AdminLayout';
 import Dashboard from './pages/Admin/Dashboard';
 import PropertyManager from './pages/Admin/PropertyManager';
+import PropertyDetail from './pages/PropertyDetail';
 
 
 const ScrollToTop = () => {
@@ -36,6 +37,7 @@ const App: React.FC = () => {
           <Route path="/special-offers" element={<SpecialOffers />} />
           <Route path="/guides" element={<Guides />} />
           <Route path="/guides/:id" element={<GuideDetail />} />
+          <Route path="/property/:id" element={<PropertyDetail />} />
           <Route path="/contact" element={<Contact />} />
         </Route>
 
