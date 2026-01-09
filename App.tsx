@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import SpecialOffers from './pages/SpecialOffers';
 import Contact from './pages/Contact';
 import Articles from './pages/Articles';
+import ArticleDetail from './pages/ArticleDetail';
 
 import Guides from './pages/Guides';
 import GuideDetail from './pages/GuideDetail';
@@ -12,6 +13,7 @@ import Login from './pages/Admin/Login';
 import AdminLayout from './pages/Admin/AdminLayout';
 import Dashboard from './pages/Admin/Dashboard';
 import PropertyManager from './pages/Admin/PropertyManager';
+import ArticleManager from './pages/Admin/ArticleManager';
 import PropertyDetail from './pages/PropertyDetail';
 
 
@@ -34,6 +36,7 @@ const App: React.FC = () => {
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/articles" element={<Articles />} />
+          <Route path="/articles/:id" element={<ArticleDetail />} />
           <Route path="/special-offers" element={<SpecialOffers />} />
           <Route path="/guides" element={<Guides />} />
           <Route path="/guides/:id" element={<GuideDetail />} />
@@ -46,7 +49,7 @@ const App: React.FC = () => {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="properties" element={<PropertyManager />} />
-          <Route path="articles" element={<div className="p-10">Feature coming soon...</div>} />
+          <Route path="articles" element={<ArticleManager />} />
         </Route>
       </Routes>
     </Router>

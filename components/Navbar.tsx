@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { BRAND_NAME } from '../constants';
+import { supabase } from '../lib/supabaseClient';
 
 const Navbar: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
-  const [searchType, setSearchType] = useState('Dijual');
+  // Default to 'Semua' so we don't accidentally filter by 'Dijual' when 'Dijual' properties don't exist as a type
+  const [searchType, setSearchType] = useState('Semua');
   const [searchQuery, setSearchQuery] = useState('');
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -18,16 +22,48 @@ const Navbar: React.FC = () => {
 
   useEffect(() => {
     setMobileMenuOpen(false);
+    setShowSuggestions(false);
   }, [location]);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+  // Real-time suggestions fetching
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (searchQuery.length < 2) {
+        setSuggestions([]);
+        return;
+      }
+
+      const { data } = await supabase
+        .from('properties')
+        .select('id, title, location, type')
+        .or(`title.ilike.%${searchQuery}%,location.ilike.%${searchQuery}%`)
+        .limit(5);
+
+      setSuggestions(data || []);
+    };
+
+    // Debounce slightly
+    const timeoutId = setTimeout(fetchSuggestions, 300);
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery]);
+
+  const handleSearch = (e: React.FormEvent, overrideQuery?: string) => {
+    if (e) e.preventDefault();
+    const queryToUse = overrideQuery || searchQuery;
+
     const params = new URLSearchParams();
-    if (searchQuery) params.set('q', searchQuery);
+    if (queryToUse) params.set('q', queryToUse);
     if (searchType && searchType !== 'Semua') params.set('type', searchType);
 
     navigate(`/?${params.toString()}`);
     setMobileMenuOpen(false);
+    setShowSuggestions(false);
+  };
+
+  const handleSuggestionClick = (propertyId: string) => {
+    navigate(`/property/${propertyId}`);
+    setShowSuggestions(false);
+    setSearchQuery('');
   };
 
   return (
@@ -45,7 +81,6 @@ const Navbar: React.FC = () => {
               </span>
               <span className="text-[8px] font-black uppercase tracking-[0.4em] text-[#10B981]">Alfazza Prestige</span>
             </div>
-            {/* Mobile Logo Text if name hidden on mobile */}
             <div className="flex flex-col md:hidden">
               <span className="text-lg font-extrabold tracking-tighter leading-none text-[#020617]">
                 {BRAND_NAME}
@@ -53,34 +88,91 @@ const Navbar: React.FC = () => {
             </div>
           </Link>
 
-          {/* Central Search Bar - Rumah123 Style */}
-          <div className="hidden lg:flex flex-1 max-w-2xl mx-6">
-            <form onSubmit={handleSearch} className="flex w-full bg-white rounded-md shadow-lg border border-slate-200 overflow-hidden group focus-within:ring-2 focus-within:ring-blue-600 transition-all h-12">
-              <div className="relative border-r border-slate-200 bg-slate-50">
+          {/* Central Search Bar */}
+          <div className="hidden lg:flex flex-1 max-w-2xl mx-6 relative">
+            <form onSubmit={handleSearch} className="flex w-full bg-white rounded-md shadow-lg border border-slate-200 overflow-hidden group focus-within:ring-2 focus-within:ring-blue-600 transition-all h-12 z-20 relative">
+              <div className="relative border-r border-slate-200 bg-slate-50 min-w-[100px]">
                 <select
                   value={searchType}
                   onChange={(e) => setSearchType(e.target.value)}
-                  className="appearance-none bg-transparent py-0 pl-4 pr-10 text-sm font-bold text-slate-700 focus:outline-none cursor-pointer hover:bg-slate-100 h-full"
+                  className="appearance-none bg-transparent py-0 pl-4 pr-8 text-sm font-bold text-slate-700 focus:outline-none cursor-pointer hover:bg-slate-100 h-full w-full"
                 >
-                  <option value="Dijual">Dijual</option>
-                  <option value="Disewa">Disewa</option>
-                  <option value="Baru">Baru</option>
+                  <option value="Semua">Semua</option>
+                  <option value="Rumah">Rumah</option>
+                  <option value="Ruko">Ruko</option>
+                  <option value="Tanah">Tanah</option>
+                  <option value="Villa">Villa</option>
+                  <option value="Gudang">Gudang</option>
                 </select>
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
                 </div>
               </div>
               <input
                 type="text"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Lokasi, keyword, area, project, developer"
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setShowSuggestions(true);
+                }}
+                onFocus={() => setShowSuggestions(true)}
+                placeholder="Cari lokasi, nama project..."
                 className="flex-1 px-4 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
+                autoComplete="off"
               />
               <button type="submit" className="bg-blue-700 hover:bg-blue-800 text-white px-8 font-bold text-sm transition-colors">
                 Cari
               </button>
             </form>
+
+            {/* Suggestions Dropdown */}
+            {showSuggestions && searchQuery.length >= 1 && (
+              <div className="absolute top-full left-0 right-0 bg-white shadow-xl rounded-b-lg border-x border-b border-gray-100 mt-0 z-10 overflow-hidden">
+                <div className="max-h-[400px] overflow-y-auto">
+                  {/* Quick Search Action */}
+                  <div
+                    onClick={(e) => handleSearch(e as any)}
+                    className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex items-center gap-3 text-sm font-medium text-blue-600 border-b border-gray-50 bg-slate-50/50"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-500">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    </div>
+                    Lihat semua hasil untuk "{searchQuery}"
+                  </div>
+
+                  {/* Suggestions List */}
+                  {suggestions.length > 0 ? (
+                    <>
+                      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-4 py-2 bg-gray-50/30">Properti Ditemukan</div>
+                      {suggestions.map((item) => (
+                        <div
+                          key={item.id}
+                          onClick={() => handleSuggestionClick(item.id)}
+                          className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex items-center gap-4 border-b border-gray-50 last:border-0 group"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold text-xs shrink-0">
+                            {item.type ? item.type[0] : 'P'}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="text-sm font-bold text-slate-800 truncate group-hover:text-emerald-600 transition-colors">{item.title}</div>
+                            <div className="text-xs text-slate-500 truncate">{item.location}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </>
+                  ) : (
+                    <div className="p-4 text-center text-sm text-slate-400 italic">
+                      Tidak ada properti spesifik yang cocok. Tekan Enter untuk pencarian luas.
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Mobile Overlay to close suggestions */}
+            {showSuggestions && (
+              <div className="fixed inset-0 z-0" onClick={() => setShowSuggestions(false)}></div>
+            )}
           </div>
 
           {/* Right Actions */}
