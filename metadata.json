@@ -1,0 +1,7 @@
+{
+  "name": "YEOBOLAND - Properti Bekasi",
+  "description": "Platform properti eksklusif untuk wilayah Bekasi dan sekitarnya oleh PT. YEOBOLAND ALFAZZA PROPERTINDO.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
