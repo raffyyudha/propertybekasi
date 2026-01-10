@@ -106,7 +106,7 @@ export const convertImageToWebP = async (file: File, watermarkUrl: string = '/lo
 
                 // 3. Draw Watermark directly without tinting
                 ctx.save();
-                ctx.globalAlpha = 0.6; // Keep transparency
+                ctx.globalAlpha = 0.9; // Higher visibility as requested
                 ctx.drawImage(watermark, x, y, targetWidth, targetHeight);
                 ctx.restore();
             }

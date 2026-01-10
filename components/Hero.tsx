@@ -124,7 +124,7 @@ const Hero: React.FC<HeroProps> = ({ filters, onSearch }) => {
           </div>
 
           {/* Floating Credibility Marker */}
-          <div className="absolute top-20 -right-12 z-20 bg-white p-10 architect-mask shadow-2xl border border-slate-50 rotate-6">
+          <div className="absolute top-20 -right-12 z-20 bg-white p-10 shadow-2xl border border-slate-50">
             <div className="text-4xl font-black text-[#020617] tracking-tighter mb-1">0%</div>
             <div className="text-[9px] font-black uppercase tracking-widest text-slate-400">{t('hero.legalRisk')}</div>
           </div>
