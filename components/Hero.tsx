@@ -44,7 +44,7 @@ const Hero: React.FC<HeroProps> = ({ filters, onSearch }) => {
   const currentStory = stories[currentIndex];
 
   return (
-    <section className="relative min-h-screen flex items-center pt-52 md:pt-36 pb-10 overflow-hidden">
+    <section className="relative min-h-screen flex items-center pt-72 md:pt-36 pb-10 overflow-hidden">
       {/* Background Decorative Element */}
       <div className="absolute top-0 right-0 w-2/5 h-screen bg-slate-50 -z-10 architect-mask translate-x-1/4 -translate-y-1/4 rotate-12"></div>
 

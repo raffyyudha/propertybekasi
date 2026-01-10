@@ -30,18 +30,41 @@ const Navbar: React.FC = () => {
   }, [location]);
 
   // Real-time suggestions fetching
+  // Load default suggestions on mount
+  useEffect(() => {
+    const loadDefaultSuggestions = async () => {
+      const { data } = await supabase
+        .from('properties')
+        .select('id, title, location, type')
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      setSuggestions(data || []);
+    };
+
+    loadDefaultSuggestions();
+  }, []);
+
+  // Update suggestions based on search query
   useEffect(() => {
     const fetchSuggestions = async () => {
-      if (searchQuery.length < 2) {
-        setSuggestions([]);
+      // If no query, show all suggestions (default)
+      if (!searchQuery) {
+        const { data } = await supabase
+          .from('properties')
+          .select('id, title, location, type')
+          .order('created_at', { ascending: false })
+          .limit(10);
+        setSuggestions(data || []);
         return;
       }
 
+      // If query exists, filter
       const { data } = await supabase
         .from('properties')
         .select('id, title, location, type')
         .or(`title.ilike.%${searchQuery}%,location.ilike.%${searchQuery}%`)
-        .limit(5);
+        .limit(10);
 
       setSuggestions(data || []);
     };
@@ -122,43 +145,69 @@ const Navbar: React.FC = () => {
             </form>
 
             {/* Suggestions Dropdown */}
-            {showSuggestions && searchQuery.length >= 1 && (
+            {showSuggestions && suggestions.length > 0 && (
               <div className="absolute top-full left-0 right-0 bg-white shadow-xl rounded-b-lg border-x border-b border-gray-100 mt-0 z-10 overflow-hidden">
                 <div className="max-h-[400px] overflow-y-auto">
-                  {/* Quick Search Action */}
-                  <div
-                    onClick={(e) => handleSearch(e as any)}
-                    className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex items-center gap-3 text-sm font-medium text-blue-600 border-b border-gray-50 bg-slate-50/50"
-                  >
-                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-500">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                    </div>
-                    Lihat semua hasil untuk "{searchQuery}"
-                  </div>
-
                   {/* Suggestions List */}
                   {suggestions.length > 0 ? (
                     <>
-                      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-4 py-2 bg-gray-50/30">Properti Ditemukan</div>
-                      {suggestions.map((item) => (
+                      {/* Lokasi Section */}
+                      {(() => {
+                        const locations = [...new Set(suggestions.map(s => s.location))];
+                        return locations.length > 0 ? (
+                          <>
+                            <div className="text-xs font-semibold text-gray-400 px-4 py-2 bg-gray-50">Lokasi</div>
+                            {locations.slice(0, 3).map((loc, idx) => (
+                              <div
+                                key={`loc-${idx}`}
+                                onClick={() => { setSearchQuery(loc); handleSearch({} as any, loc); }}
+                                className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex items-center justify-between border-b border-gray-50 group"
+                              >
+                                <div className="flex items-center gap-3">
+                                  <svg className="w-5 h-5 text-slate-600" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                                  </svg>
+                                  <span className="text-sm text-slate-800">{loc}</span>
+                                </div>
+                                <svg className="w-4 h-4 text-slate-400 group-hover:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                              </div>
+                            ))}
+                          </>
+                        ) : null;
+                      })()}
+
+                      {/* Perumahan Section */}
+                      <div className="text-xs font-semibold text-gray-400 px-4 py-2 bg-gray-50">Perumahan</div>
+                      {suggestions.slice(0, 5).map((item) => (
                         <div
                           key={item.id}
                           onClick={() => handleSuggestionClick(item.id)}
-                          className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex items-center gap-4 border-b border-gray-50 last:border-0 group"
+                          className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex items-center justify-between border-b border-gray-50 last:border-0 group"
                         >
-                          <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold text-xs shrink-0">
-                            {item.type ? item.type[0] : 'P'}
+                          <div className="flex items-center gap-3 min-w-0">
+                            <svg className="w-5 h-5 text-slate-600 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+                            </svg>
+                            <div className="min-w-0">
+                              <div className="text-sm font-semibold text-slate-800 truncate">{item.title}</div>
+                            </div>
                           </div>
-                          <div className="min-w-0">
-                            <div className="text-sm font-bold text-slate-800 truncate group-hover:text-emerald-600 transition-colors">{item.title}</div>
-                            <div className="text-xs text-slate-500 truncate">{item.location}</div>
-                          </div>
+                          <svg className="w-4 h-4 text-slate-400 group-hover:text-slate-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
                         </div>
                       ))}
+
+                      {/* Hint Message */}
+                      <div className="px-4 py-3 text-xs text-slate-500 bg-slate-50 border-t">
+                        Kolom searching sudah di kasih arahan sesuai listing yg di miliki
+                      </div>
                     </>
                   ) : (
                     <div className="p-4 text-center text-sm text-slate-400 italic">
-                      Tidak ada properti spesifik yang cocok. Tekan Enter untuk pencarian luas.
+                      Tidak ada properti yang cocok.
                     </div>
                   )}
                 </div>
@@ -172,33 +221,32 @@ const Navbar: React.FC = () => {
           </div>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-4 md:gap-6 text-xs font-bold">
-            <Link to="/articles" className={`hidden md:block hover:text-blue-600 transition-colors uppercase tracking-wider ${scrolled ? 'text-slate-600' : 'text-slate-600'}`}>
+          <div className="flex items-center gap-2 md:gap-3">
+            <Link to="/articles" className={`hidden md:flex items-center hover:text-blue-600 transition-colors uppercase tracking-wider text-xs font-bold ${scrolled ? 'text-slate-600' : 'text-slate-600'}`}>
               {t('nav.articles')}
             </Link>
 
             <button
               onClick={() => navigate('/special-offers')}
-              className="hidden md:flex items-center gap-2 px-4 py-2 border border-slate-300 rounded overflow-hidden hover:border-slate-400 bg-white transition-all text-slate-700 active:scale-95"
+              className="hidden md:flex items-center gap-2 px-3 py-2 border border-slate-300 rounded overflow-hidden hover:border-slate-400 bg-white transition-all text-slate-700 active:scale-95 h-10"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" /></svg>
-              <span>{t('nav.specialOffers')}</span>
+              <span className="text-xs">{t('nav.specialOffers')}</span>
             </button>
 
-            <div
+            <button
               onClick={() => navigate('/guides')}
-              className="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors text-slate-700"
+              className="flex items-center justify-center w-10 h-10 cursor-pointer hover:text-blue-600 transition-colors text-slate-700 hover:bg-slate-50 rounded-full"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-              <span className="hidden sm:inline">{t('nav.guides')}</span>
-            </div>
+            </button>
 
             {/* Language/Settings Dropdown */}
-            <div className="relative relative-group">
+            <div className="relative">
               <button
                 onClick={() => setShowSettings(!showSettings)}
                 onBlur={() => setTimeout(() => setShowSettings(false), 200)}
-                className="p-2 text-slate-700 hover:text-blue-600 transition-colors flex items-center justify-center w-10 h-10"
+                className="flex items-center justify-center w-10 h-10 text-slate-700 hover:text-blue-600 transition-colors hover:bg-slate-50 rounded-full"
               >
                 {language === 'id' ? (
                   <span className="text-2xl" role="img" aria-label="Indonesian Flag">🇮🇩</span>
@@ -232,7 +280,7 @@ const Navbar: React.FC = () => {
 
             <button
               onClick={() => navigate('/contact')}
-              className="hidden lg:block bg-[#020617] text-white px-5 py-2.5 rounded hover:bg-black transition-all shadow-lg active:scale-95 ml-2"
+              className="hidden lg:flex items-center justify-center bg-[#020617] text-white px-5 h-10 rounded hover:bg-black transition-all shadow-lg active:scale-95"
             >
               {t('nav.contact')}
             </button>
@@ -241,27 +289,111 @@ const Navbar: React.FC = () => {
           {/* Mobile menu button */}
           <button
             onClick={() => setMobileMenuOpen(true)}
-            className="lg:hidden w-10 h-10 flex items-center justify-center bg-slate-100 rounded-full active:scale-95 transition-transform"
+            className="lg:hidden flex items-center justify-center w-10 h-10 bg-slate-100 rounded-full active:scale-95 transition-transform"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
           </button>
         </div>
 
-        {/* Mobile Search - Fixed below navbar */}
-        <div className="lg:hidden fixed top-28 left-0 right-0 w-full px-4 py-3 bg-white/98 backdrop-blur-md border-b border-gray-200 shadow-md z-40">
-          <form onSubmit={handleSearch} className="flex w-full bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Cari lokasi..."
-              className="flex-1 px-4 py-3 text-sm bg-transparent focus:outline-none text-slate-900 placeholder:text-slate-400"
-            />
-            <button type="submit" className="px-4 text-slate-500">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-            </button>
-          </form>
-        </div>
+        {/* Mobile Search - Fixed below navbar (Hidden on Property Detail) */}
+        {!location.pathname.startsWith('/property/') && (
+          <div className="lg:hidden fixed top-36 left-0 right-0 w-full px-4 py-4 bg-white/98 backdrop-blur-md border-b border-gray-200 shadow-md z-40">
+            <div className="relative">
+              <form onSubmit={handleSearch} className="flex flex-col gap-2">
+                {/* Type Selector */}
+                <select
+                  value={searchType}
+                  onChange={(e) => setSearchType(e.target.value)}
+                  className="w-full px-4 py-3 text-sm font-bold text-slate-700 bg-slate-100 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                >
+                  <option value="Semua">Semua Tipe</option>
+                  <option value="Rumah">Rumah</option>
+                  <option value="Ruko">Ruko</option>
+                  <option value="Tanah">Tanah</option>
+                  <option value="Villa">Villa</option>
+                  <option value="Gudang">Gudang</option>
+                </select>
+
+                {/* Search Input */}
+                <div className="flex w-full bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setShowSuggestions(true);
+                    }}
+                    onFocus={() => setShowSuggestions(true)}
+                    placeholder="Cari lokasi..."
+                    className="flex-1 px-4 py-3 text-sm bg-transparent focus:outline-none text-slate-900 placeholder:text-slate-400"
+                  />
+                  <button type="submit" className="px-4 text-slate-500">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                  </button>
+                </div>
+              </form>
+
+              {/* Mobile Suggestions Dropdown */}
+              {showSuggestions && suggestions.length > 0 && (
+                <div className="absolute top-full left-0 right-0 bg-white shadow-xl rounded-b-lg border border-gray-100 mt-2 max-h-[400px] overflow-y-auto z-50">
+                  {/* Lokasi Section */}
+                  {(() => {
+                    const locations = [...new Set(suggestions.map(s => s.location))];
+                    return locations.length > 0 ? (
+                      <>
+                        <div className="text-xs font-semibold text-gray-400 px-4 py-2 bg-gray-50">Lokasi</div>
+                        {locations.slice(0, 3).map((loc, idx) => (
+                          <div
+                            key={`loc-${idx}`}
+                            onClick={() => { setSearchQuery(loc as string); handleSearch({} as any, loc as string); setShowSuggestions(false); }}
+                            className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex items-center justify-between border-b border-gray-50 active:bg-slate-100"
+                          >
+                            <div className="flex items-center gap-3">
+                              <svg className="w-5 h-5 text-slate-600" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                              </svg>
+                              <span className="text-sm text-slate-800">{loc}</span>
+                            </div>
+                            <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </div>
+                        ))}
+                      </>
+                    ) : null;
+                  })()}
+
+                  {/* Perumahan Section */}
+                  <div className="text-xs font-semibold text-gray-400 px-4 py-2 bg-gray-50">Perumahan</div>
+                  {suggestions.slice(0, 5).map((item) => (
+                    <div
+                      key={item.id}
+                      onClick={() => { handleSuggestionClick(item.id); setShowSuggestions(false); }}
+                      className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex items-center justify-between border-b border-gray-50 last:border-0 active:bg-slate-100"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <svg className="w-5 h-5 text-slate-600 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+                        </svg>
+                        <div className="min-w-0">
+                          <div className="text-sm font-semibold text-slate-800 truncate">{item.title}</div>
+                        </div>
+                      </div>
+                      <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  ))}
+
+                  {/* Hint Message */}
+                  <div className="px-4 py-3 text-xs text-slate-500 bg-slate-50 border-t">
+                    Kolom searching sudah di kasih arahan sesuai listing yg di miliki
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Mobile Menu Overlay */}

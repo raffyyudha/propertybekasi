@@ -214,17 +214,20 @@ const PropertyDetail: React.FC = () => {
     const isEmbeddable = embedUrl.includes('output=embed') || embedUrl.includes('/embed');
 
     return (
-        <div className="pt-24 pb-20 min-h-screen bg-white text-[#333]">
-            {/* Header / Breadcrumb */}
-            <div className="max-w-[1280px] mx-auto px-4 md:px-6 mb-6">
-                <div className="text-sm text-gray-400 mb-4 flex items-center gap-2">
-                    <span className="cursor-pointer hover:text-orange-500" onClick={() => navigate('/')}>{t('bread.home')}</span>
-                    <span>/</span>
-                    <span className="cursor-pointer hover:text-orange-500" onClick={() => navigate('/')}>{t('bread.buy')}</span>
-                    <span>/</span>
-                    <span className="text-gray-800 font-medium truncate max-w-[200px]">{property.title}</span>
-                </div>
+        <div className="pt-28 pb-20 min-h-screen bg-white text-[#333]">
+            {/* Back Button */}
+            <div className="max-w-[1280px] mx-auto px-4 md:px-6 mt-6 mb-4">
+                <button
+                    onClick={() => navigate(-1)}
+                    className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors"
+                >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                    <span className="font-medium">Kembali</span>
+                </button>
             </div>
+
 
             {/* Gallery Section */}
             <div className="max-w-[1280px] mx-auto px-4 md:px-6 mb-10">
