@@ -16,34 +16,6 @@ const Hero: React.FC<HeroProps> = ({ filters, onSearch }) => {
   const navigate = useNavigate();
   const { t } = useLanguage();
 
-  // Mock data if DB is empty 
-  const MOCK_STORIES: Story[] = [
-    {
-      id: 'mock-1',
-      title: 'Promo Merdeka 45%',
-      image_url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=1200',
-      link_url: '/special-offers',
-      display_order: 1,
-      is_active: true
-    },
-    {
-      id: 'mock-2',
-      title: 'Cluster Baru 2025',
-      image_url: 'https://images.unsplash.com/photo-1600596542815-2495db98dada?auto=format&fit=crop&q=80&w=1200',
-      link_url: '/property/1',
-      display_order: 2,
-      is_active: true
-    },
-    {
-      id: 'mock-3',
-      title: 'Legalitas Aman',
-      image_url: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&q=80&w=1200',
-      link_url: 'https://images.unsplash.com/photo-1512915922610-182180353c80?auto=format&fit=crop&q=80&w=1200',
-      display_order: 3,
-      is_active: true
-    }
-  ];
-
   useEffect(() => {
     const fetchStories = async () => {
       const { data } = await supabase
@@ -55,7 +27,7 @@ const Hero: React.FC<HeroProps> = ({ filters, onSearch }) => {
       if (data && data.length > 0) {
         setStories(data);
       } else {
-        setStories(MOCK_STORIES);
+        setStories([]);
       }
     };
     fetchStories();
@@ -69,7 +41,7 @@ const Hero: React.FC<HeroProps> = ({ filters, onSearch }) => {
     return () => clearInterval(interval);
   }, [stories]);
 
-  const currentStory = stories[currentIndex] || MOCK_STORIES[0];
+  const currentStory = stories[currentIndex];
 
   return (
     <section className="relative min-h-screen flex items-center pt-44 md:pt-36 pb-10 overflow-hidden">
@@ -82,35 +54,44 @@ const Hero: React.FC<HeroProps> = ({ filters, onSearch }) => {
         <div className="lg:col-span-4 block relative reveal-up" style={{ animationDelay: '0s' }}>
 
           {/* Main Masked Slideshow Container */}
-          <div className="relative z-10 architect-mask overflow-hidden aspect-[3/4.5] shadow-3xl bg-slate-200 group cursor-pointer" onClick={() => currentStory.link_url && navigate(currentStory.link_url)} >
+          <div className="relative z-10 architect-mask overflow-hidden aspect-[3/4.5] shadow-3xl bg-slate-200 group cursor-pointer" onClick={() => currentStory?.link_url && navigate(currentStory.link_url)} >
             {/* Slides */}
-            {stories.map((story, idx) => (
-              <div
-                key={story.id}
-                className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${idx === currentIndex ? 'opacity-100' : 'opacity-0'}`}
-              >
-                <img
-                  src={story.image_url}
-                  className="w-full h-full object-cover transition-transform duration-[4000ms] ease-linear scale-110 group-hover:scale-100"
-                  alt={story.title}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/60 to-transparent"></div>
+            {stories.length > 0 ? (
+              stories.map((story, idx) => (
+                <div
+                  key={story.id}
+                  className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${idx === currentIndex ? 'opacity-100' : 'opacity-0'}`}
+                >
+                  <img
+                    src={story.image_url}
+                    className="w-full h-full object-cover transition-transform duration-[4000ms] ease-linear scale-110 group-hover:scale-100"
+                    alt={story.title}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/60 to-transparent"></div>
 
-                {/* Story Content */}
-                <div className="absolute bottom-0 left-0 right-0 p-8">
-                  {story.title && (
-                    <div className="text-white font-black text-2xl md:text-3xl leading-tight mb-2 opacity-0 animate-[fadeUp_0.5s_0.3s_forwards]">
-                      {story.title}
-                    </div>
-                  )}
-                  {story.link_url && (
-                    <div className="inline-flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase tracking-widest opacity-0 animate-[fadeUp_0.5s_0.5s_forwards]">
-                      Lihat Detail <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-                    </div>
-                  )}
+                  {/* Story Content */}
+                  <div className="absolute bottom-0 left-0 right-0 p-8">
+                    {story.title && (
+                      <div className="text-white font-black text-2xl md:text-3xl leading-tight mb-2 opacity-0 animate-[fadeUp_0.5s_0.3s_forwards]">
+                        {story.title}
+                      </div>
+                    )}
+                    {story.link_url && (
+                      <div className="inline-flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase tracking-widest opacity-0 animate-[fadeUp_0.5s_0.5s_forwards]">
+                        Lihat Detail <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))
+            ) : (
+              // Empty State - Just a placeholder background or logo if desired
+              <div className="absolute inset-0 flex items-center justify-center bg-slate-100">
+                <div className="w-20 h-20 rounded-full bg-slate-200 flex items-center justify-center">
+                  <span className="text-slate-300 font-black text-2xl italic">Y</span>
                 </div>
               </div>
-            ))}
+            )}
 
             {/* Navigation Buttons - Always visible */}
             {stories.length > 1 && (

@@ -22,7 +22,9 @@ const Footer: React.FC = () => {
           {/* Brand Column (4 cols) */}
           <div className="lg:col-span-5 flex flex-col gap-8">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white text-[#020617] rounded-xl flex items-center justify-center font-black italic text-lg shadow-lg">Y</div>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg overflow-hidden">
+                <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
+              </div>
               <div className="flex flex-col">
                 <span className="text-2xl font-black tracking-tight text-white">{BRAND_NAME}</span>
                 <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-emerald-500">Alfazza Prestige</span>

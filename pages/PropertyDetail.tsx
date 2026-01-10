@@ -12,6 +12,56 @@ const PropertyDetail: React.FC = () => {
     const [property, setProperty] = useState<Property | null>(null);
     const [loading, setLoading] = useState(true);
     const [activeImage, setActiveImage] = useState(0);
+    const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+
+    const openLightbox = (index: number) => {
+        setActiveImage(index);
+        setIsLightboxOpen(true);
+    };
+
+    const closeLightbox = () => setIsLightboxOpen(false);
+
+    const nextImage = (e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        if (property) {
+            setActiveImage((prev) => (prev + 1) % property.images.length);
+        }
+    };
+
+    const prevImage = (e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        if (property) {
+            setActiveImage((prev) => (prev - 1 + property.images.length) % property.images.length);
+        }
+    };
+
+    // Swipe Handling for Mobile Lightbox
+    const [touchStart, setTouchStart] = useState<number | null>(null);
+    const [touchEnd, setTouchEnd] = useState<number | null>(null);
+    const minSwipeDistance = 50;
+
+    const onTouchStart = (e: React.TouchEvent) => {
+        setTouchEnd(null);
+        setTouchStart(e.targetTouches[0].clientX);
+    };
+
+    const onTouchMove = (e: React.TouchEvent) => {
+        setTouchEnd(e.targetTouches[0].clientX);
+    };
+
+    const onTouchEnd = () => {
+        if (!touchStart || !touchEnd) return;
+        const distance = touchStart - touchEnd;
+        const isLeftSwipe = distance > minSwipeDistance;
+        const isRightSwipe = distance < -minSwipeDistance;
+
+        if (isLeftSwipe) {
+            nextImage();
+        }
+        if (isRightSwipe) {
+            prevImage();
+        }
+    };
 
     // KPR Calculator State
     const [dpPercentage, setDpPercentage] = useState(10);
@@ -94,8 +144,8 @@ const PropertyDetail: React.FC = () => {
                 brand: BRAND_NAME,
                 title: property.title,
                 id: property.id,
-                date: visitDate,
-                note: visitNote
+                date: visitDate || 'Not specified',
+                note: visitNote || '-',
             });
         } else {
             const template = t('wa.general');
@@ -109,8 +159,59 @@ const PropertyDetail: React.FC = () => {
         window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
     };
 
+    /**
+     * Otomatis mengkonversi link Google Maps biasa/pendek menjadi format Embed
+     */
+    const getSmartMapUrl = (inputUrl: string) => {
+        if (!inputUrl) return '';
+
+        let cleanUrl = inputUrl;
+        // 0. Cleanup iframe tags
+        if (inputUrl.includes('<iframe')) {
+            const srcMatch = inputUrl.match(/src="([^"]+)"/);
+            if (srcMatch) cleanUrl = srcMatch[1];
+        }
+
+        // 1. Direct Embed Support
+        if (cleanUrl.includes('/embed') || cleanUrl.includes('output=embed')) {
+            return cleanUrl;
+        }
+
+        // 2. Coordinate Extraction (Most Reliable)
+        const coordsMatch = cleanUrl.match(/@(-?[\d\.]+),(-?[\d\.]+)/);
+        if (coordsMatch) {
+            const lat = coordsMatch[1];
+            const lng = coordsMatch[2];
+            return `https://maps.google.com/maps?q=${lat},${lng}&hl=id&z=14&output=embed`;
+        }
+
+        // 3. Search Query Extraction via 'q' param
+        if (cleanUrl.includes('?q=')) {
+            const query = cleanUrl.split('?q=')[1].split('&')[0];
+            return `https://maps.google.com/maps?q=${query}&hl=id&z=14&output=embed`;
+        }
+
+        // 4. Place Name via path
+        if (cleanUrl.includes('/maps/place/')) {
+            const parts = cleanUrl.split('/maps/place/');
+            if (parts[1]) {
+                let query = parts[1].split('/')[0];
+                query = query.replace(/\+/g, ' ');
+                return `https://maps.google.com/maps?q=${encodeURIComponent(query)}&hl=id&z=14&output=embed`;
+            }
+        }
+
+        // 5. Short Link / Unknown - DO NOT TRY TO EMBED blindly.
+        // Returning the original URL signals 'isEmbeddable = false', triggering the fallback button.
+        return cleanUrl;
+    };
+
     if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div></div>;
     if (!property) return null;
+
+    const embedUrl = getSmartMapUrl(property.mapUrl);
+    // Strict check: It is only embeddable if our function successfully converted it to an embed URL.
+    const isEmbeddable = embedUrl.includes('output=embed') || embedUrl.includes('/embed');
 
     return (
         <div className="pt-24 pb-20 min-h-screen bg-white text-[#333]">
@@ -129,16 +230,24 @@ const PropertyDetail: React.FC = () => {
             <div className="max-w-[1280px] mx-auto px-4 md:px-6 mb-10">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 h-[400px] md:h-[500px]">
                     {/* Main Image */}
-                    <div className="md:col-span-2 md:row-span-2 relative rounded-xl overflow-hidden group cursor-pointer" onClick={() => setActiveImage(0)}>
+                    <div className="md:col-span-2 md:row-span-2 relative rounded-xl overflow-hidden group cursor-pointer" onClick={() => openLightbox(0)}>
                         <img src={property.images[0]} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Main" />
                         <div className="absolute top-4 left-4 flex gap-2">
                             {property.isFeatured && <span className="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded uppercase tracking-wider">{t('prop.hotDeals')}</span>}
                             <span className="bg-white/90 text-gray-800 text-xs font-bold px-3 py-1.5 rounded uppercase border border-gray-200">{property.type}</span>
                         </div>
+
+                        {/* Mobile Photo Count Indicator - Only visible on Mobile */}
+                        {property.images.length > 1 && (
+                            <div className="absolute bottom-4 right-4 bg-black/60 text-white text-xs font-bold px-3 py-1.5 rounded-lg backdrop-blur-sm md:hidden flex items-center gap-1.5">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                1/{property.images.length}
+                            </div>
+                        )}
                     </div>
                     {/* Side Images */}
                     {property.images.slice(1, 5).map((img, idx) => (
-                        <div key={idx} className="relative rounded-xl overflow-hidden cursor-pointer group hidden md:block" onClick={() => setActiveImage(idx + 1)}>
+                        <div key={idx} className="relative rounded-xl overflow-hidden cursor-pointer group hidden md:block" onClick={() => openLightbox(idx + 1)}>
                             <img src={img} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" alt={`Side ${idx}`} />
                             {idx === 3 && property.images.length > 5 && (
                                 <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white font-bold text-lg">
@@ -279,14 +388,30 @@ const PropertyDetail: React.FC = () => {
                                 <h3 className="font-bold text-xl text-gray-900 mb-4 border-b pb-4">{t('prop.location')}</h3>
                                 <div className="rounded-xl overflow-hidden h-[300px] bg-gray-100 relative">
                                     {property.mapUrl ? (
-                                        <iframe
-                                            src={property.mapUrl}
-                                            width="100%"
-                                            height="100%"
-                                            style={{ border: 0 }}
-                                            allowFullScreen
-                                            loading="lazy"
-                                        ></iframe>
+                                        isEmbeddable ? (
+                                            <iframe
+                                                src={embedUrl}
+                                                width="100%"
+                                                height="100%"
+                                                style={{ border: 0 }}
+                                                allowFullScreen
+                                                loading="lazy"
+                                                referrerPolicy="no-referrer-when-downgrade"
+                                            ></iframe>
+                                        ) : (
+                                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 text-center p-6">
+                                                <p className="text-gray-500 mb-4 text-sm">Pratinjau peta tidak tersedia untuk link pendek.</p>
+                                                <a
+                                                    href={property.mapUrl}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="bg-white border border-gray-300 px-5 py-2.5 rounded-lg text-sm font-bold text-gray-700 shadow-sm hover:bg-gray-50 flex items-center gap-2 transition-colors"
+                                                >
+                                                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                                    Buka di Google Maps
+                                                </a>
+                                            </div>
+                                        )
                                     ) : (
                                         <div className="absolute inset-0 flex items-center justify-center text-gray-400">{t('prop.mapUnavailable')}</div>
                                     )}
@@ -378,6 +503,57 @@ const PropertyDetail: React.FC = () => {
 
                 </div>
             </div>
+
+            {/* Lightbox Modal */}
+            {isLightboxOpen && (
+                <div
+                    className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 touch-none"
+                    onTouchStart={onTouchStart}
+                    onTouchMove={onTouchMove}
+                    onTouchEnd={onTouchEnd}
+                >
+                    {/* Close Button - Enhanced */}
+                    <button onClick={closeLightbox} className="absolute top-6 right-6 z-[110] p-2 bg-black/50 hover:bg-white/20 rounded-full text-white transition-all backdrop-blur-sm">
+                        <svg className="w-8 h-8 md:w-10 md:h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+
+                    <button onClick={prevImage} className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white z-50 p-2 md:p-4 hover:bg-white/10 rounded-full transition-all bg-black/20 backdrop-blur-sm md:bg-transparent">
+                        <svg className="w-8 h-8 md:w-10 md:h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+                    </button>
+
+                    <button onClick={nextImage} className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white z-50 p-2 md:p-4 hover:bg-white/10 rounded-full transition-all bg-black/20 backdrop-blur-sm md:bg-transparent">
+                        <svg className="w-8 h-8 md:w-10 md:h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+                    </button>
+
+                    {/* Mobile Tap Areas - Adjusted to not cover close button */}
+                    <div className="absolute inset-y-20 left-0 w-1/4 z-40 md:hidden" onClick={prevImage} />
+                    <div className="absolute inset-y-20 right-0 w-1/4 z-40 md:hidden" onClick={nextImage} />
+
+                    <div className="relative max-w-7xl max-h-[90vh] w-full flex flex-col items-center pointer-events-none">
+                        <div className="relative w-full h-full flex items-center justify-center pointer-events-auto">
+                            <img
+                                src={property.images[activeImage]}
+                                className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl"
+                                alt={`Gallery ${activeImage + 1}`}
+                            />
+                        </div>
+                        <div className="mt-6 flex gap-2 overflow-x-auto max-w-full pb-2 px-2 scrollbar-none pointer-events-auto w-full justify-center">
+                            {property.images.map((img, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={(e) => { e.stopPropagation(); setActiveImage(idx); }}
+                                    className={`relative flex-shrink-0 w-14 h-14 md:w-20 md:h-20 rounded-lg overflow-hidden border-2 transition-all ${activeImage === idx ? 'border-orange-500 opacity-100' : 'border-transparent opacity-50 hover:opacity-80'}`}
+                                >
+                                    <img src={img} className="w-full h-full object-cover" alt={`Thumb ${idx}`} />
+                                </button>
+                            ))}
+                        </div>
+                        <div className="text-white/80 font-medium text-sm mt-4 bg-black/50 px-3 py-1 rounded-full backdrop-blur-sm">
+                            {activeImage + 1} / {property.images.length}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -79,8 +79,8 @@ const Navbar: React.FC = () => {
         <div className={`max-w-[1600px] mx-auto px-4 md:px-10 flex items-center justify-between gap-4 transition-all duration-300 ${scrolled ? 'py-3' : 'py-5'}`}>
           {/* Logo Section */}
           <Link to="/" className="flex items-center gap-2 flex-shrink-0">
-            <div className="w-8 h-8 bg-[#020617] rounded-full flex items-center justify-center">
-              <span className="text-white font-extrabold text-xs italic">Y</span>
+            <div className="w-12 h-12 flex items-center justify-center">
+              <img src="/logo.png" alt="Logo" className="w-full h-full object-contain brightness-0" />
             </div>
             <div className="flex flex-col hidden md:flex">
               <span className={`text-lg font-extrabold tracking-tighter leading-none ${scrolled ? 'text-[#020617]' : 'text-[#020617]'}`}>

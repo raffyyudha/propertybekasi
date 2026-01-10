@@ -472,19 +472,42 @@ const PropertyManager: React.FC = () => {
                                 {currentProperty.images && currentProperty.images.length > 0 && (
                                     <div className="grid grid-cols-4 gap-4 mt-4">
                                         {currentProperty.images.map((img: string, idx: number) => (
-                                            <div key={idx} className="relative group aspect-square bg-slate-100 rounded-lg overflow-hidden">
-                                                <img src={img} alt="" className="w-full h-full object-cover" />
+                                            <div
+                                                key={idx}
+                                                draggable
+                                                onDragStart={(e) => e.dataTransfer.setData('sourceIdx', idx.toString())}
+                                                onDragOver={(e) => e.preventDefault()}
+                                                onDrop={(e) => {
+                                                    e.preventDefault();
+                                                    const sourceIdx = Number(e.dataTransfer.getData('sourceIdx'));
+                                                    if (sourceIdx === idx || isNaN(sourceIdx)) return;
+
+                                                    const newImages = [...(currentProperty.images || [])];
+                                                    const [movedItem] = newImages.splice(sourceIdx, 1);
+                                                    newImages.splice(idx, 0, movedItem);
+
+                                                    setCurrentProperty({ ...currentProperty, images: newImages });
+                                                }}
+                                                className="relative group aspect-square bg-slate-100 rounded-lg overflow-hidden cursor-move border-2 border-transparent hover:border-emerald-500 transition-all"
+                                                title="Drag untuk mengubah urutan"
+                                            >
+                                                <img src={img} alt="" className="w-full h-full object-cover pointer-events-none" />
                                                 <button
                                                     type="button"
                                                     onClick={() => {
                                                         const newImgs = currentProperty.images.filter((_: any, i: number) => i !== idx);
                                                         setCurrentProperty({ ...currentProperty, images: newImgs });
                                                     }}
-                                                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10"
                                                 >
                                                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                                                 </button>
-                                                {idx === 0 && <span className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[10px] text-center py-1">Cover</span>}
+                                                {idx === 0 && (
+                                                    <span className="absolute bottom-0 left-0 right-0 bg-emerald-600/90 text-white text-[10px] font-bold text-center py-1">
+                                                        Utama (Cover)
+                                                    </span>
+                                                )}
+                                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors pointer-events-none" />
                                             </div>
                                         ))}
                                     </div>
