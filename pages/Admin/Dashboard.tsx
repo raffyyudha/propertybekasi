@@ -9,6 +9,43 @@ const Dashboard: React.FC = () => {
         messages: 0 // Placeholder
     });
     const [loading, setLoading] = useState(true);
+    const [runningText, setRunningText] = useState('');
+    const [saving, setSaving] = useState(false);
+
+    useEffect(() => {
+        fetchStats();
+        fetchRunningText();
+    }, []);
+
+    const fetchRunningText = async () => {
+        const { data } = await supabase
+            .from('site_settings')
+            .select('value')
+            .eq('key', 'running_text')
+            .single();
+
+        if (data) {
+            setRunningText(data.value);
+        }
+    };
+
+    const updateRunningText = async () => {
+        setSaving(true);
+        try {
+            // Check if exists first to decide insert or update (upsert is better but let's be explicit or use upsert)
+            const { error } = await supabase
+                .from('site_settings')
+                .upsert({ key: 'running_text', value: runningText }, { onConflict: 'key' });
+
+            if (error) throw error;
+            alert('Running text updated!');
+        } catch (err) {
+            console.error(err);
+            alert('Failed to update running text');
+        } finally {
+            setSaving(false);
+        }
+    };
 
     useEffect(() => {
         fetchStats();
@@ -56,6 +93,27 @@ const Dashboard: React.FC = () => {
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 opacity-50">
                     <div className="text-slate-500 text-sm font-bold uppercase tracking-wider mb-2">Pesan Masuk (Coming Soon)</div>
                     <div className="text-4xl font-black text-slate-300">-</div>
+                </div>
+            </div>
+
+            {/* Running Text Management */}
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100 mb-8">
+                <h2 className="text-xl font-bold mb-4">Running Text Header</h2>
+                <div className="flex gap-4 items-center">
+                    <input
+                        type="text"
+                        value={runningText}
+                        onChange={(e) => setRunningText(e.target.value)}
+                        className="flex-1 p-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        placeholder="Masukkan teks berjalan disini..."
+                    />
+                    <button
+                        onClick={updateRunningText}
+                        disabled={saving}
+                        className="px-6 py-3 bg-[#020617] text-white font-bold rounded-lg hover:bg-slate-800 transition-colors disabled:opacity-50"
+                    >
+                        {saving ? 'Menyimpan...' : 'Simpan'}
+                    </button>
                 </div>
             </div>
 

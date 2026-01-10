@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { BRAND_NAME } from '../constants';
 import { supabase } from '../lib/supabaseClient';
+import RunningText from './RunningText';
 
 const Navbar: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -68,8 +69,11 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-      <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${scrolled ? 'bg-white shadow-md py-3' : 'bg-transparent py-5'}`}>
-        <div className="max-w-[1600px] mx-auto px-4 md:px-10 flex items-center justify-between gap-4">
+      <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${scrolled ? 'bg-white shadow-md' : 'bg-transparent'}`}>
+        {/* Running Text Section */}
+        <RunningText />
+
+        <div className={`max-w-[1600px] mx-auto px-4 md:px-10 flex items-center justify-between gap-4 transition-all duration-300 ${scrolled ? 'py-3' : 'py-5'}`}>
           {/* Logo Section */}
           <Link to="/" className="flex items-center gap-2 flex-shrink-0">
             <div className="w-8 h-8 bg-[#020617] rounded-full flex items-center justify-center">
