@@ -44,7 +44,7 @@ const Hero: React.FC<HeroProps> = ({ filters, onSearch }) => {
   const currentStory = stories[currentIndex];
 
   return (
-    <section className="relative min-h-screen flex items-center pt-44 md:pt-36 pb-10 overflow-hidden">
+    <section className="relative min-h-screen flex items-center pt-52 md:pt-36 pb-10 overflow-hidden">
       {/* Background Decorative Element */}
       <div className="absolute top-0 right-0 w-2/5 h-screen bg-slate-50 -z-10 architect-mask translate-x-1/4 -translate-y-1/4 rotate-12"></div>
 
@@ -53,8 +53,8 @@ const Hero: React.FC<HeroProps> = ({ filters, onSearch }) => {
         {/* Visual Architectural Column (SLIDESHOW) - Swapped to 1st Position */}
         <div className="lg:col-span-4 block relative reveal-up" style={{ animationDelay: '0s' }}>
 
-          {/* Main Masked Slideshow Container */}
-          <div className="relative z-10 architect-mask overflow-hidden aspect-[3/4.5] shadow-3xl bg-slate-200 group cursor-pointer" onClick={() => currentStory?.link_url && navigate(currentStory.link_url)} >
+          {/* Main Story Container - PERFECT SQUARE */}
+          <div className="relative z-10 rounded-2xl overflow-hidden aspect-square shadow-3xl bg-slate-200 group cursor-pointer" onClick={() => currentStory?.link_url && navigate(currentStory.link_url)} >
             {/* Slides */}
             {stories.length > 0 ? (
               stories.map((story, idx) => (
@@ -123,10 +123,10 @@ const Hero: React.FC<HeroProps> = ({ filters, onSearch }) => {
             </div>
           </div>
 
-          {/* Floating Credibility Marker */}
-          <div className="absolute top-20 -right-12 z-20 bg-white p-10 shadow-2xl border border-slate-50">
-            <div className="text-4xl font-black text-[#020617] tracking-tighter mb-1">0%</div>
-            <div className="text-[9px] font-black uppercase tracking-widest text-slate-400">{t('hero.legalRisk')}</div>
+          {/* Floating Credibility Marker - FULL SQUARE PERFECT BOX */}
+          <div className="absolute top-20 right-4 lg:-right-12 z-20 bg-white aspect-square w-[180px] flex flex-col items-center justify-center shadow-2xl border border-slate-50">
+            <div className="text-5xl font-black text-[#020617] tracking-tighter mb-1">0%</div>
+            <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 text-center px-4">{t('hero.legalRisk')}</div>
           </div>
         </div>
 

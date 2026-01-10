@@ -247,8 +247,8 @@ const Navbar: React.FC = () => {
           </button>
         </div>
 
-        {/* Mobile Search - Visible only on mobile below header */}
-        <div className="lg:hidden w-full px-4 pb-4 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm mt-3 pt-2">
+        {/* Mobile Search - Fixed below navbar */}
+        <div className="lg:hidden fixed top-28 left-0 right-0 w-full px-4 py-3 bg-white/98 backdrop-blur-md border-b border-gray-200 shadow-md z-40">
           <form onSubmit={handleSearch} className="flex w-full bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
             <input
               type="text"
@@ -258,7 +258,7 @@ const Navbar: React.FC = () => {
               className="flex-1 px-4 py-3 text-sm bg-transparent focus:outline-none text-slate-900 placeholder:text-slate-400"
             />
             <button type="submit" className="px-4 text-slate-500">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
             </button>
           </form>
         </div>
