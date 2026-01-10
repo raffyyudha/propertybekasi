@@ -76,32 +76,8 @@ const Hero: React.FC<HeroProps> = ({ filters, onSearch }) => {
 
       <div className="max-w-[1600px] mx-auto px-4 md:px-10 w-full grid lg:grid-cols-12 gap-10 items-center">
 
-        {/* Editorial Text Column */}
-        <div className="lg:col-span-8 relative z-20 pt-10 md:pt-0">
-          <div className="reveal-up">
-            <div className="flex items-center gap-4 mb-6 md:mb-10">
-              <span className="h-[1px] w-8 md:w-12 bg-[#020617]"></span>
-              <span className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-400">The New Standard</span>
-            </div>
-
-            <h1 className="text-4xl sm:text-6xl md:text-[90px] lg:text-[120px] xl:text-[140px] font-extrabold text-display mb-6 md:mb-12 text-[#020617] leading-[0.9] tracking-tight">
-              ARCHITECTING <br />
-              <span className="text-slate-200">DREAMS</span> IN <br />
-              BEKASI<span className="text-emerald-500">.</span>
-            </h1>
-          </div>
-
-          <div className="max-w-xl reveal-up" style={{ animationDelay: '0.2s' }}>
-            <p className="text-base md:text-xl text-slate-500 font-medium leading-relaxed mb-10 md:mb-16 border-l-2 border-emerald-500 pl-6 md:pl-8">
-              Kami tidak sekadar menjual unit; kami mengkurasi ekosistem hunian kelas atas dengan standar legalitas dan arsitektur tanpa kompromi.
-            </p>
-          </div>
-
-
-        </div>
-
-        {/* Visual Architectural Column (SLIDESHOW) */}
-        <div className="lg:col-span-4 block relative reveal-up mt-10 lg:mt-0" style={{ animationDelay: '0.6s' }}>
+        {/* Visual Architectural Column (SLIDESHOW) - Swapped to 1st Position */}
+        <div className="lg:col-span-4 block relative reveal-up" style={{ animationDelay: '0s' }}>
 
           {/* Main Masked Slideshow Container */}
           <div className="relative z-10 architect-mask overflow-hidden aspect-[3/4.5] shadow-3xl bg-slate-200 group cursor-pointer" onClick={() => currentStory.link_url && navigate(currentStory.link_url)} >
@@ -170,6 +146,31 @@ const Hero: React.FC<HeroProps> = ({ filters, onSearch }) => {
             <div className="text-[9px] font-black uppercase tracking-widest text-slate-400">Legal Risk Rate</div>
           </div>
         </div>
+
+        {/* Editorial Text Column - Swapped to 2nd Position */}
+        <div className="lg:col-span-8 relative z-20 pt-10 md:pt-0 mt-10 lg:mt-0">
+          <div className="reveal-up" style={{ animationDelay: '0.2s' }}>
+            <div className="flex items-center gap-4 mb-6 md:mb-10">
+              <span className="h-[1px] w-8 md:w-12 bg-[#020617]"></span>
+              <span className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-400">The New Standard</span>
+            </div>
+
+            <h1 className="text-4xl sm:text-6xl md:text-[90px] lg:text-[120px] xl:text-[140px] font-extrabold text-display mb-6 md:mb-12 text-[#020617] leading-[0.9] tracking-tight">
+              ARCHITECTING <br />
+              <span className="text-slate-200">DREAMS</span> IN <br />
+              BEKASI<span className="text-emerald-500">.</span>
+            </h1>
+          </div>
+
+          <div className="max-w-xl reveal-up" style={{ animationDelay: '0.4s' }}>
+            <p className="text-base md:text-xl text-slate-500 font-medium leading-relaxed mb-10 md:mb-16 border-l-2 border-emerald-500 pl-6 md:pl-8">
+              Kami tidak sekadar menjual unit; kami mengkurasi ekosistem hunian kelas atas dengan standar legalitas dan arsitektur tanpa kompromi.
+            </p>
+          </div>
+
+
+        </div>
+
       </div>
 
       {/* Vertical Decorative Label */}
