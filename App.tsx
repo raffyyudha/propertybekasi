@@ -13,6 +13,7 @@ import Login from './pages/Admin/Login';
 import AdminLayout from './pages/Admin/AdminLayout';
 import Dashboard from './pages/Admin/Dashboard';
 import PropertyManager from './pages/Admin/PropertyManager';
+import StoryManager from './pages/Admin/StoryManager';
 import ArticleManager from './pages/Admin/ArticleManager';
 import PropertyDetail from './pages/PropertyDetail';
 
@@ -49,6 +50,7 @@ const App: React.FC = () => {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="properties" element={<PropertyManager />} />
+          <Route path="stories" element={<StoryManager />} />
           <Route path="articles" element={<ArticleManager />} />
         </Route>
       </Routes>

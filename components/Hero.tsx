@@ -1,6 +1,8 @@
 
-import React from 'react';
-import { PropertyType, SearchFilters } from '../types';
+import React, { useEffect, useState } from 'react';
+import { PropertyType, SearchFilters, Story } from '../types';
+import { supabase } from '../lib/supabaseClient';
+import { useNavigate } from 'react-router-dom';
 
 interface HeroProps {
   filters: SearchFilters;
@@ -8,8 +10,67 @@ interface HeroProps {
 }
 
 const Hero: React.FC<HeroProps> = ({ filters, onSearch }) => {
+  const [stories, setStories] = useState<Story[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const navigate = useNavigate();
+
+  // Mock data if DB is empty 
+  const MOCK_STORIES: Story[] = [
+    {
+      id: 'mock-1',
+      title: 'Promo Merdeka 45%',
+      image_url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=1200',
+      link_url: '/special-offers',
+      display_order: 1,
+      is_active: true
+    },
+    {
+      id: 'mock-2',
+      title: 'Cluster Baru 2025',
+      image_url: 'https://images.unsplash.com/photo-1600596542815-2495db98dada?auto=format&fit=crop&q=80&w=1200',
+      link_url: '/property/1',
+      display_order: 2,
+      is_active: true
+    },
+    {
+      id: 'mock-3',
+      title: 'Legalitas Aman',
+      image_url: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&q=80&w=1200',
+      link_url: 'https://images.unsplash.com/photo-1512915922610-182180353c80?auto=format&fit=crop&q=80&w=1200',
+      display_order: 3,
+      is_active: true
+    }
+  ];
+
+  useEffect(() => {
+    const fetchStories = async () => {
+      const { data } = await supabase
+        .from('stories')
+        .select('*')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true });
+
+      if (data && data.length > 0) {
+        setStories(data);
+      } else {
+        setStories(MOCK_STORIES);
+      }
+    };
+    fetchStories();
+  }, []);
+
+  useEffect(() => {
+    if (stories.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentIndex(prev => (prev + 1) % stories.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [stories]);
+
+  const currentStory = stories[currentIndex] || MOCK_STORIES[0];
+
   return (
-    <section className="relative min-h-screen flex items-center pt-20 pb-32 overflow-hidden">
+    <section className="relative min-h-screen flex items-center pt-20 pb-10 overflow-hidden">
       {/* Background Decorative Element */}
       <div className="absolute top-0 right-0 w-2/5 h-screen bg-slate-50 -z-10 architect-mask translate-x-1/4 -translate-y-1/4 rotate-12"></div>
 
@@ -36,50 +97,71 @@ const Hero: React.FC<HeroProps> = ({ filters, onSearch }) => {
             </p>
           </div>
 
-          {/* Masterpiece Command Capsule */}
-          <div className="reveal-up" style={{ animationDelay: '0.4s' }}>
-            <div className="inline-flex flex-col md:flex-row items-center bg-white p-3 rounded-[30px] md:rounded-[40px] shadow-[0_48px_100px_-20px_rgba(2,6,23,0.15)] border border-slate-100 group w-full md:w-auto">
-              <div className="flex items-center px-4 md:px-8 py-3 md:py-0 border-b md:border-b-0 md:border-r border-slate-50 w-full md:min-w-[300px]">
-                <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center mr-4 group-focus-within:bg-emerald-50 transition-colors shrink-0">
-                  <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                </div>
-                <input
-                  type="text"
-                  placeholder="Nama Proyek atau Lokasi..."
-                  className="w-full bg-transparent text-sm md:text-base font-bold placeholder-slate-300 focus:outline-none"
-                  value={filters.query}
-                  onChange={(e) => onSearch({ query: e.target.value })}
-                />
-              </div>
 
-              <div className="px-4 md:px-10 py-3 md:py-0 flex items-center gap-4 w-full md:w-auto">
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-300 shrink-0">Tipe</span>
-                <select
-                  className="bg-transparent font-black text-sm uppercase tracking-wider text-[#020617] appearance-none focus:outline-none cursor-pointer w-full md:w-auto"
-                  value={filters.type}
-                  onChange={(e) => onSearch({ type: e.target.value })}
-                >
-                  <option value="">Semua</option>
-                  {Object.values(PropertyType).map(t => <option key={t} value={t}>{t}</option>)}
-                </select>
-              </div>
-
-              <button className="w-full md:w-auto bg-[#020617] text-white font-black text-[11px] uppercase tracking-[0.3em] px-8 md:px-14 py-4 md:py-6 rounded-full hover:bg-black hover:scale-[1.02] transition-all active:scale-95 shadow-2xl mt-2 md:mt-0">
-                Explore Inventory
-              </button>
-            </div>
-          </div>
         </div>
 
-        {/* Visual Architectural Column */}
+        {/* Visual Architectural Column (SLIDESHOW) */}
         <div className="lg:col-span-4 block relative reveal-up mt-10 lg:mt-0" style={{ animationDelay: '0.6s' }}>
-          <div className="relative z-10 architect-mask overflow-hidden aspect-[3/4.5] shadow-3xl bg-slate-200">
-            <img
-              src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=1200"
-              className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000"
-              alt="Luxury Architecture"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/40 to-transparent"></div>
+
+          {/* Main Masked Slideshow Container */}
+          <div className="relative z-10 architect-mask overflow-hidden aspect-[3/4.5] shadow-3xl bg-slate-200 group cursor-pointer" onClick={() => currentStory.link_url && navigate(currentStory.link_url)} >
+            {/* Slides */}
+            {stories.map((story, idx) => (
+              <div
+                key={story.id}
+                className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${idx === currentIndex ? 'opacity-100' : 'opacity-0'}`}
+              >
+                <img
+                  src={story.image_url}
+                  className="w-full h-full object-cover transition-transform duration-[4000ms] ease-linear scale-110 group-hover:scale-100"
+                  alt={story.title}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/60 to-transparent"></div>
+
+                {/* Story Content */}
+                <div className="absolute bottom-0 left-0 right-0 p-8">
+                  {story.title && (
+                    <div className="text-white font-black text-2xl md:text-3xl leading-tight mb-2 opacity-0 animate-[fadeUp_0.5s_0.3s_forwards]">
+                      {story.title}
+                    </div>
+                  )}
+                  {story.link_url && (
+                    <div className="inline-flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase tracking-widest opacity-0 animate-[fadeUp_0.5s_0.5s_forwards]">
+                      Lihat Detail <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+
+            {/* Navigation Buttons - Always visible */}
+            {stories.length > 1 && (
+              <>
+                <button
+                  onClick={(e) => { e.stopPropagation(); setCurrentIndex((prev) => (prev - 1 + stories.length) % stories.length); }}
+                  className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 rounded-full bg-black/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white hover:bg-white hover:text-[#020617] transition-all z-30"
+                >
+                  <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); setCurrentIndex((prev) => (prev + 1) % stories.length); }}
+                  className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 rounded-full bg-black/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white hover:bg-white hover:text-[#020617] transition-all z-30"
+                >
+                  <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                </button>
+              </>
+            )}
+
+            {/* Navigation Dots (Optional) */}
+            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-20">
+              {stories.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={(e) => { e.stopPropagation(); setCurrentIndex(idx); }}
+                  className={`w-1.5 h-1.5 rounded-full transition-all ${idx === currentIndex ? 'bg-white w-4' : 'bg-white/40'}`}
+                />
+              ))}
+            </div>
           </div>
 
           {/* Floating Credibility Marker */}
@@ -94,6 +176,13 @@ const Hero: React.FC<HeroProps> = ({ filters, onSearch }) => {
       <div className="absolute left-10 bottom-20 hidden xl:block origin-left -rotate-90">
         <span className="text-[10px] font-black uppercase tracking-[1em] text-slate-200">YEOBOLAND ALFAZZA PRESTIGE © 2024</span>
       </div>
+
+      <style>{`
+          @keyframes fadeUp {
+              from { opacity: 0; transform: translateY(10px); }
+              to { opacity: 1; transform: translateY(0); }
+          }
+      `}</style>
     </section>
   );
 };

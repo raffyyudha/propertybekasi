@@ -39,3 +39,14 @@ export interface SearchFilters {
   minPrice: string;
   maxPrice: string;
 }
+
+export interface Story {
+  id: string;
+  created_at?: string;
+  title: string;
+  image_url: string;
+  link_url?: string;
+  display_order: number;
+  is_active: boolean;
+}
+

@@ -7,6 +7,7 @@ import { supabase } from '../lib/supabaseClient';
 import Hero from '../components/Hero';
 import PropertyCard from '../components/PropertyCard';
 import CompactPropertyCard from '../components/CompactPropertyCard';
+import StoryFeed from '../components/StoryFeed';
 
 const Home: React.FC = () => {
     const navigate = useNavigate();
@@ -110,35 +111,8 @@ const Home: React.FC = () => {
             <Hero onSearch={handleSearch} filters={filters} />
 
             {/* Curated Collection Section */}
-            <section id="selected-portfolio" className="max-w-[1600px] mx-auto px-4 md:px-10 py-16 md:py-40">
-                <div className="flex flex-col md:flex-row justify-between items-end mb-12 md:mb-32 gap-10">
-                    <div className="max-w-4xl">
-                        <div className="flex items-center gap-6 mb-6 md:mb-10">
-                            <span className="h-[1px] w-24 bg-emerald-500"></span>
-                            <span className="text-emerald-500 font-black uppercase tracking-[0.5em] text-[10px]">Prime Inventory</span>
-                        </div>
-                        <h2 className="text-4xl sm:text-6xl md:text-[90px] font-extrabold text-[#020617] leading-[0.85] tracking-tighter">
-                            SELECTED <br />
-                            <span className="text-slate-200">PORTFOLIO.</span>
-                        </h2>
-                    </div>
-                    <div className="flex flex-col items-end gap-6">
-                        {/* New CTA Button */}
-                        <button
-                            onClick={() => navigate('/special-offers')}
-                            className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#020617] to-[#1e293b] text-white rounded-full font-bold uppercase tracking-wider text-xs overflow-hidden shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
-                        >
-                            <span className="relative z-10">Lihat Penawaran Khusus</span>
-                            <svg className="w-4 h-4 text-emerald-400 relative z-10 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-                            <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-                        </button>
-
-                        <div className="flex flex-col items-end">
-                            <div className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-4">Total Listings</div>
-                            <div className="text-6xl font-extrabold text-[#020617] tabular-nums">{filteredProperties.length}</div>
-                        </div>
-                    </div>
-                </div>
+            <section id="selected-portfolio" className="max-w-[1600px] mx-auto px-4 md:px-10 pt-0 pb-20">
+                <div className="flex flex-col md:flex-row justify-between items-end mb-12 md:mb-32 gap-10 hidden"></div>
 
                 {filteredProperties.length > 0 ? (
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -183,11 +157,11 @@ const Home: React.FC = () => {
                                 <span className="h-[1px] w-20 bg-emerald-500"></span>
                                 <span className="text-emerald-500 font-black uppercase tracking-[0.5em] text-[10px]">The Platinum Standard</span>
                             </div>
-                            <h2 className="text-4xl sm:text-6xl md:text-[110px] font-extrabold leading-[0.85] tracking-tighter mb-10 md:mb-16">
+                            <h2 className="text-3xl sm:text-5xl md:text-[90px] font-extrabold leading-[0.9] tracking-tighter mb-6 md:mb-16">
                                 BEYOND <br />
                                 THE <span className="text-slate-600">TRANSACTION.</span>
                             </h2>
-                            <p className="text-2xl text-slate-400 font-medium max-w-xl leading-relaxed">
+                            <p className="text-sm md:text-xl text-slate-400 font-medium max-w-xl leading-relaxed">
                                 Layanan kami melampaui jual-beli. Kami adalah konsultan strategis yang memastikan aset Anda memiliki nilai investasi jangka panjang yang aman.
                             </p>
                         </div>
