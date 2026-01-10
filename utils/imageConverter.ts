@@ -30,23 +30,73 @@ export const convertImageToWebP = async (file: File, watermarkUrl: string = '/lo
         watermark.src = watermarkUrl; // Load from public folder
 
         const processCanvas = () => {
+            // First, draw image to a temp canvas to inspect pixels
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = img.width;
+            tempCanvas.height = img.height;
+            const tempCtx = tempCanvas.getContext('2d');
+            if (!tempCtx) {
+                reject(new Error('Canvas context not available'));
+                return;
+            }
+            tempCtx.drawImage(img, 0, 0);
+
+            // AUTO CROP LOGIC
+            const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+            const { data, width, height } = imageData;
+            let minX = width, minY = height, maxX = 0, maxY = 0;
+
+            // Scan for non-white/non-transparent pixels
+            // Assuming "white" is > 250 on RGB and "transparent" is alpha 0
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const idx = (y * width + x) * 4;
+                    const r = data[idx];
+                    const g = data[idx + 1];
+                    const b = data[idx + 2];
+                    const a = data[idx + 3];
+
+                    // Heuristic: Keep pixel if NOT (Transparent OR Almost White)
+                    // You can adjust the threshold 245 to be more or less sensitive
+                    const isWhite = r > 245 && g > 245 && b > 245;
+                    const isTransparent = a < 10;
+
+                    if (!isWhite && !isTransparent) {
+                        if (x < minX) minX = x;
+                        if (x > maxX) maxX = x;
+                        if (y < minY) minY = y;
+                        if (y > maxY) maxY = y;
+                    }
+                }
+            }
+
+            // If image is blank (all white/transparent), fallback to full size
+            if (maxX < minX || maxY < minY) {
+                minX = 0; minY = 0; maxX = width; maxY = height;
+            }
+
+            // Add a tiny padding if possible? No, user wants crop "biar pure fotonya".
+            const cropWidth = maxX - minX + 1;
+            const cropHeight = maxY - minY + 1;
+
+            // Now create the final canvas with cropped dimensions
             const canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
+            canvas.width = cropWidth;
+            canvas.height = cropHeight;
             const ctx = canvas.getContext('2d');
             if (!ctx) {
                 reject(new Error('Canvas context not available'));
                 return;
             }
 
-            // Draw main image
-            ctx.drawImage(img, 0, 0);
+            // Draw cropped portion
+            ctx.drawImage(img, minX, minY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
 
-            // Draw Watermark
+            // Draw Watermark on Clean Cropped Image
             if (watermark.naturalWidth > 0) {
                 // 1. Prepare Watermark Dimensions
-                const padding = img.width * 0.03; // 3% padding
-                const targetWidth = img.width * 0.25; // 25% of image width (smaller/corner)
+                const padding = cropWidth * 0.03; // 3% padding
+                const targetWidth = cropWidth * 0.25; // 25% of cropped width
                 const scale = targetWidth / watermark.width;
                 const targetHeight = watermark.height * scale;
 
@@ -54,27 +104,11 @@ export const convertImageToWebP = async (file: File, watermarkUrl: string = '/lo
                 const x = padding;
                 const y = padding;
 
-                // 3. Create a temporary canvas to tint the logo BLACK
-                const tempCanvas = document.createElement('canvas');
-                tempCanvas.width = targetWidth;
-                tempCanvas.height = targetHeight;
-                const tempCtx = tempCanvas.getContext('2d');
-
-                if (tempCtx) {
-                    // Draw original logo
-                    tempCtx.drawImage(watermark, 0, 0, targetWidth, targetHeight);
-
-                    // Tint it Black
-                    tempCtx.globalCompositeOperation = 'source-in';
-                    tempCtx.fillStyle = '#000000'; // Pure Black
-                    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-
-                    // 4. Draw Tinted Watermark onto Main Canvas
-                    ctx.save();
-                    ctx.globalAlpha = 0.6; // Higher opacity (0.6) for better visibility
-                    ctx.drawImage(tempCanvas, x, y);
-                    ctx.restore();
-                }
+                // 3. Draw Watermark directly without tinting
+                ctx.save();
+                ctx.globalAlpha = 0.6; // Keep transparency
+                ctx.drawImage(watermark, x, y, targetWidth, targetHeight);
+                ctx.restore();
             }
 
             canvas.toBlob((blob) => {
