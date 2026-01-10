@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import { Property, PropertyType } from '../types';
 import { WHATSAPP_NUMBER } from '../constants';
 
@@ -8,16 +9,18 @@ interface PropertyCardProps {
   onClick: () => void;
 }
 
-const formatPrice = (price: number) => {
-  if (price >= 1000000000) return `Rp ${(price / 1000000000).toFixed(1)} Miliar`.replace('.', ',');
-  if (price >= 1000000) return `Rp ${(price / 1000000).toFixed(0)} Juta`;
-  return `Rp ${price.toLocaleString('id-ID')}`;
-};
-
 const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
+  const { t } = useLanguage();
+
+  const formatPrice = (price: number) => {
+    if (price >= 1000000000) return `Rp ${(price / 1000000000).toFixed(1)} ${t('card.billion')}`.replace('.', ',');
+    if (price >= 1000000) return `Rp ${(price / 1000000).toFixed(0)} ${t('card.million')}`;
+    return `Rp ${price.toLocaleString('id-ID')}`;
+  };
+
   const handleWhatsApp = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const message = `Halo Yeoboland, saya tertarik dengan: ${property.title}.`;
+    const message = t('card.waMessage').replace('{title}', property.title);
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
@@ -41,7 +44,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
           </span>
           {property.isFeatured && (
             <span className="bg-[#020617] text-white text-[9px] font-black uppercase tracking-widest px-4 py-2 rounded-full">
-              Exclusive
+              {t('card.exclusive')}
             </span>
           )}
         </div>
@@ -49,7 +52,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
         {/* Floating Price */}
         <div className="absolute bottom-6 left-6">
           <div className="bg-white px-5 py-2.5 rounded-2xl shadow-xl flex flex-col">
-            <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest mb-0.5">Price Guide</span>
+            <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest mb-0.5">{t('card.priceGuide')}</span>
             <span className="text-xl font-extrabold text-[#020617] tracking-tight">{formatPrice(property.price)}</span>
           </div>
         </div>
@@ -69,15 +72,15 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
         {/* Technical Specification Matrix */}
         <div className="grid grid-cols-3 gap-6 py-8 border-t border-slate-50 mt-auto">
           <div className="flex flex-col">
-            <span className="text-[9px] text-slate-300 font-black uppercase tracking-widest mb-1.5">Area</span>
+            <span className="text-[9px] text-slate-300 font-black uppercase tracking-widest mb-1.5">{t('card.area')}</span>
             <span className="text-base font-extrabold text-[#020617]">{property.landArea} <span className="text-[10px] text-slate-400 font-medium">m²</span></span>
           </div>
           <div className="flex flex-col border-x border-slate-50 px-6">
-            <span className="text-[9px] text-slate-300 font-black uppercase tracking-widest mb-1.5">Build</span>
+            <span className="text-[9px] text-slate-300 font-black uppercase tracking-widest mb-1.5">{t('card.build')}</span>
             <span className="text-base font-extrabold text-[#020617]">{property.buildingArea || '-'} <span className="text-[10px] text-slate-400 font-medium">m²</span></span>
           </div>
           <div className="flex flex-col items-end">
-            <span className="text-[9px] text-slate-300 font-black uppercase tracking-widest mb-1.5">Beds</span>
+            <span className="text-[9px] text-slate-300 font-black uppercase tracking-widest mb-1.5">{t('card.beds')}</span>
             <span className="text-base font-extrabold text-[#020617]">{property.bedrooms || '-'}</span>
           </div>
         </div>
@@ -88,7 +91,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onClick }) => {
             onClick={handleWhatsApp}
             className="w-full bg-[#020617] hover:bg-black text-white font-black text-[10px] uppercase tracking-widest py-5 rounded-[22px] flex items-center justify-center gap-3 transition-all active:scale-95 shadow-2xl"
           >
-            Konsultasi Sekarang
+            {t('card.consult')}
           </button>
         </div>
       </div>

@@ -1,22 +1,24 @@
 
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useLanguage } from '../contexts/LanguageContext';
 import { GUIDE_ARTICLES } from '../constants';
 
 const GuideDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const { t } = useLanguage();
     const guide = GUIDE_ARTICLES.find(g => g.id === Number(id));
 
     if (!guide) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center pt-32 pb-20 px-4">
-                <h2 className="text-2xl font-bold text-slate-800 mb-4">Artikel Tidak Ditemukan</h2>
+                <h2 className="text-2xl font-bold text-slate-800 mb-4">{t('guide.notFound')}</h2>
                 <button
                     onClick={() => navigate('/guides')}
                     className="bg-emerald-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-emerald-600 transition-colors"
                 >
-                    Kembali ke Panduan
+                    {t('guide.back')}
                 </button>
             </div>
         );
@@ -61,11 +63,11 @@ const GuideDetail: React.FC = () => {
             <article className="max-w-4xl mx-auto px-6 md:px-10">
                 <div
                     className="prose prose-lg prose-slate max-w-none prose-headings:font-bold prose-headings:text-slate-900 prose-p:text-slate-600 prose-a:text-emerald-500 hover:prose-a:text-emerald-600"
-                    dangerouslySetInnerHTML={{ __html: guide.content || '<p>Konten artikel sedang disiapkan. Silakan hubungi kami untuk informasi lebih lanjut.</p>' }}
+                    dangerouslySetInnerHTML={{ __html: guide.content || `<p>${t('guide.contentPlaceholder')}</p>` }}
                 />
 
                 <div className="mt-20 pt-10 border-t border-slate-200">
-                    <h3 className="text-2xl font-bold mb-6">Bagikan Artikel Ini</h3>
+                    <h3 className="text-2xl font-bold mb-6">{t('guide.share')}</h3>
                     <div className="flex gap-4">
                         {['Facebook', 'Twitter', 'WhatsApp', 'LinkedIn'].map((social) => (
                             <button key={social} className="px-6 py-3 rounded-full border border-slate-200 font-bold text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-all text-sm">
@@ -78,7 +80,7 @@ const GuideDetail: React.FC = () => {
 
             {/* Related Articles */}
             <div className="max-w-[1200px] mx-auto px-6 md:px-10 mt-32">
-                <h2 className="text-3xl font-bold mb-10 text-slate-900">Artikel Terkait</h2>
+                <h2 className="text-3xl font-bold mb-10 text-slate-900">{t('guide.related')}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {GUIDE_ARTICLES.filter(g => g.id !== guide.id).slice(0, 3).map(related => (
                         <div
@@ -101,7 +103,7 @@ const GuideDetail: React.FC = () => {
                         className="inline-flex items-center gap-2 text-emerald-600 font-bold hover:text-emerald-700 transition-colors"
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                        Kembali ke Daftar Panduan
+                        {t('guide.backToList')}
                     </button>
                 </div>
             </div>

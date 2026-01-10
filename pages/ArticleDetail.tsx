@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../lib/supabaseClient';
 
 const ArticleDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const { t } = useLanguage();
     const [article, setArticle] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
@@ -41,7 +43,7 @@ const ArticleDetail: React.FC = () => {
 
     if (!article) return (
         <div className="min-h-screen flex items-center justify-center bg-white">
-            <p className="text-xl font-bold text-slate-400">Artikel tidak ditemukan.</p>
+            <p className="text-xl font-bold text-slate-400">{t('article.notFound')}</p>
         </div>
     );
 
@@ -53,7 +55,7 @@ const ArticleDetail: React.FC = () => {
                     className="flex items-center gap-2 text-slate-500 font-bold mb-8 hover:text-emerald-500 transition-colors"
                 >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                    Back to Articles
+                    {t('article.back')}
                 </button>
 
                 <div className="mb-6 flex items-center gap-4">
@@ -72,8 +74,8 @@ const ArticleDetail: React.FC = () => {
                         {article.author ? article.author[0] : 'A'}
                     </div>
                     <div>
-                        <p className="text-sm font-bold text-[#020617]">By {article.author || 'YeoboLand Team'}</p>
-                        <p className="text-xs text-slate-400 font-medium">Editor Choice</p>
+                        <p className="text-sm font-bold text-[#020617]">{t('articles.by')} {article.author || 'YeoboLand Team'}</p>
+                        <p className="text-xs text-slate-400 font-medium">{t('article.editorChoice')}</p>
                     </div>
                 </div>
 

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { PropertyType, SearchFilters, Story } from '../types';
 import { supabase } from '../lib/supabaseClient';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface HeroProps {
   filters: SearchFilters;
@@ -13,6 +14,7 @@ const Hero: React.FC<HeroProps> = ({ filters, onSearch }) => {
   const [stories, setStories] = useState<Story[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   // Mock data if DB is empty 
   const MOCK_STORIES: Story[] = [
@@ -143,31 +145,34 @@ const Hero: React.FC<HeroProps> = ({ filters, onSearch }) => {
           {/* Floating Credibility Marker */}
           <div className="absolute top-20 -right-12 z-20 bg-white p-10 architect-mask shadow-2xl border border-slate-50 rotate-6">
             <div className="text-4xl font-black text-[#020617] tracking-tighter mb-1">0%</div>
-            <div className="text-[9px] font-black uppercase tracking-widest text-slate-400">Legal Risk Rate</div>
+            <div className="text-[9px] font-black uppercase tracking-widest text-slate-400">{t('hero.legalRisk')}</div>
           </div>
         </div>
 
         {/* Editorial Text Column - Swapped to 2nd Position */}
-        <div className="lg:col-span-8 relative z-20 pt-10 md:pt-0 mt-10 lg:mt-0">
+        <div className="lg:col-span-8 relative z-20 pt-10 md:pt-0 mt-0 lg:mt-0">
           <div className="reveal-up" style={{ animationDelay: '0.2s' }}>
-            <div className="flex items-center gap-4 mb-6 md:mb-10">
-              <span className="h-[1px] w-8 md:w-12 bg-[#020617]"></span>
-              <span className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-400">The New Standard</span>
+            {/* Top Gap Filler Poster - Hidden on Desktop, No Margin */}
+            <div className="w-full rounded-2xl overflow-hidden shadow-lg border border-slate-100 lg:hidden mb-0">
+              <img src="/promo-banner.png" alt="Promo Banner" className="w-full h-24 md:h-32 object-cover" />
             </div>
 
-            <h1 className="text-4xl sm:text-6xl md:text-[90px] lg:text-[120px] xl:text-[140px] font-extrabold text-display mb-6 md:mb-12 text-[#020617] leading-[0.9] tracking-tight">
-              ARCHITECTING <br />
-              <span className="text-slate-200">DREAMS</span> IN <br />
-              BEKASI<span className="text-emerald-500">.</span>
+            <h1 className="text-4xl sm:text-6xl md:text-[90px] lg:text-[120px] xl:text-[140px] font-extrabold text-display mb-0 md:mb-12 text-[#020617] leading-[0.9] tracking-tight mt-1 md:mt-0">
+              {t('hero.architecting')} <br />
+              <span className="text-slate-200">{t('hero.dreams')}</span> {t('hero.inBekasi')} <span className="text-emerald-500">.</span>
             </h1>
           </div>
 
           <div className="max-w-xl reveal-up" style={{ animationDelay: '0.4s' }}>
-            <p className="text-base md:text-xl text-slate-500 font-medium leading-relaxed mb-10 md:mb-16 border-l-2 border-emerald-500 pl-6 md:pl-8">
-              Kami tidak sekadar menjual unit; kami mengkurasi ekosistem hunian kelas atas dengan standar legalitas dan arsitektur tanpa kompromi.
+            <p className="text-base md:text-xl text-slate-500 font-medium leading-relaxed mb-0 md:mb-16 border-l-2 border-emerald-500 pl-6 md:pl-8 mt-4 md:mt-0">
+              {t('hero.description')}
             </p>
           </div>
 
+          {/* Bottom Gap Filler Poster - Hidden on Desktop */}
+          <div className="w-full max-w-xl rounded-2xl overflow-hidden shadow-lg border border-slate-100 mb-10 lg:hidden mt-4">
+            <img src="/promo-banner.png" alt="Promo Banner" className="w-full h-24 md:h-32 object-cover" />
+          </div>
 
         </div>
 

@@ -1,9 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../contexts/LanguageContext';
 import { GUIDE_ARTICLES } from '../constants';
 
 const Guides: React.FC = () => {
     const navigate = useNavigate();
+    const { t } = useLanguage();
 
     return (
         <div className="pt-28 pb-20 min-h-screen bg-slate-50">
@@ -11,16 +13,24 @@ const Guides: React.FC = () => {
                 {/* Header */}
                 <div className="mb-12 text-center">
                     <h1 className="text-3xl md:text-5xl font-extrabold text-[#020617] mb-4">
-                        Panduan Properti
+                        {t('guides.title')}
                     </h1>
                     <p className="text-slate-500 max-w-2xl mx-auto text-lg">
-                        Temukan wawasan dan tips lengkap seputar jual beli, sewa, dan investasi properti dari para ahli.
+                        {t('guides.subtitle')}
                     </p>
                 </div>
 
                 {/* Categories Pills */}
                 <div className="flex flex-wrap justify-center gap-3 mb-12">
-                    {['Semua', 'Beli Properti', 'Jual Properti', 'KPR', 'Legalitas', 'Investasi', 'Gaya Hidup'].map((cat, idx) => (
+                    {[
+                        t('guides.cat.all'),
+                        t('guides.cat.buy'),
+                        t('guides.cat.sell'),
+                        t('guides.cat.kpr'),
+                        t('guides.cat.legal'),
+                        t('guides.cat.invest'),
+                        t('guides.cat.lifestyle')
+                    ].map((cat, idx) => (
                         <button
                             key={idx}
                             className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${idx === 0 ? 'bg-[#020617] text-white' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}`}
@@ -65,11 +75,11 @@ const Guides: React.FC = () => {
                 <div className="mt-20 bg-[#020617] rounded-[40px] p-10 md:p-16 text-center text-white relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500 blur-[100px] opacity-20 pointer-events-none"></div>
                     <div className="relative z-10 max-w-2xl mx-auto">
-                        <h2 className="text-3xl font-bold mb-4">Jangan Lewatkan Update Terbaru</h2>
-                        <p className="text-slate-400 mb-8">Dapatkan tips properti eksklusif dan info pasar terbaru langsung di inbox Anda.</p>
+                        <h2 className="text-3xl font-bold mb-4">{t('guides.newsletterTitle')}</h2>
+                        <p className="text-slate-400 mb-8">{t('guides.newsletterText')}</p>
                         <div className="flex gap-2 max-w-md mx-auto">
-                            <input type="email" placeholder="Alamat Email Anda" className="flex-1 px-6 py-3 rounded-full bg-white/10 border border-white/10 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500" />
-                            <button className="bg-emerald-500 text-white font-bold px-8 py-3 rounded-full hover:bg-emerald-400 transition-colors">Daftar</button>
+                            <input type="email" placeholder={t('guides.emailPlaceholder')} className="flex-1 px-6 py-3 rounded-full bg-white/10 border border-white/10 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500" />
+                            <button className="bg-emerald-500 text-white font-bold px-8 py-3 rounded-full hover:bg-emerald-400 transition-colors">{t('guides.subscribe')}</button>
                         </div>
                     </div>
                 </div>

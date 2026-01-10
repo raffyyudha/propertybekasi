@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import { Property } from '../types';
 
 interface CompactPropertyCardProps {
@@ -6,13 +7,15 @@ interface CompactPropertyCardProps {
     onClick: () => void;
 }
 
-const formatPriceCompact = (price: number) => {
-    if (price >= 1000000000) return `Rp ${(price / 1000000000).toFixed(1)} Miliar`.replace('.', ',');
-    if (price >= 1000000) return `Rp ${(price / 1000000).toFixed(0)} Juta`;
-    return `Rp ${price.toLocaleString('id-ID')}`;
-};
-
 const CompactPropertyCard: React.FC<CompactPropertyCardProps> = ({ property, onClick }) => {
+    const { t } = useLanguage();
+
+    const formatPriceCompact = (price: number) => {
+        if (price >= 1000000000) return `Rp ${(price / 1000000000).toFixed(1)} ${t('card.billion')}`.replace('.', ',');
+        if (price >= 1000000) return `Rp ${(price / 1000000).toFixed(0)} ${t('card.million')}`;
+        return `Rp ${price.toLocaleString('id-ID')}`;
+    };
+
     return (
         <div
             onClick={onClick}
@@ -27,7 +30,7 @@ const CompactPropertyCard: React.FC<CompactPropertyCardProps> = ({ property, onC
                 />
                 {property.isPromo && (
                     <span className="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded">
-                        Promo
+                        {t('card.promo')}
                     </span>
                 )}
             </div>

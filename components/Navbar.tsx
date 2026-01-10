@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { BRAND_NAME } from '../constants';
 import { supabase } from '../lib/supabaseClient';
 import RunningText from './RunningText';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const Navbar: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -12,8 +13,10 @@ const Navbar: React.FC = () => {
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { t, language, setLanguage } = useLanguage();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -182,7 +185,7 @@ const Navbar: React.FC = () => {
           {/* Right Actions */}
           <div className="flex items-center gap-4 md:gap-6 text-xs font-bold">
             <Link to="/articles" className={`hidden md:block hover:text-blue-600 transition-colors uppercase tracking-wider ${scrolled ? 'text-slate-600' : 'text-slate-600'}`}>
-              Artikel
+              {t('nav.articles')}
             </Link>
 
             <button
@@ -190,7 +193,7 @@ const Navbar: React.FC = () => {
               className="hidden md:flex items-center gap-2 px-4 py-2 border border-slate-300 rounded overflow-hidden hover:border-slate-400 bg-white transition-all text-slate-700 active:scale-95"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" /></svg>
-              <span>Penawaran Khusus</span>
+              <span>{t('nav.specialOffers')}</span>
             </button>
 
             <div
@@ -198,14 +201,51 @@ const Navbar: React.FC = () => {
               className="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors text-slate-700"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-              <span className="hidden sm:inline">Panduan</span>
+              <span className="hidden sm:inline">{t('nav.guides')}</span>
+            </div>
+
+            {/* Language/Settings Dropdown */}
+            <div className="relative relative-group">
+              <button
+                onClick={() => setShowSettings(!showSettings)}
+                onBlur={() => setTimeout(() => setShowSettings(false), 200)}
+                className="p-2 text-slate-700 hover:text-blue-600 transition-colors flex items-center justify-center w-10 h-10"
+              >
+                {language === 'id' ? (
+                  <span className="text-2xl" role="img" aria-label="Indonesian Flag">🇮🇩</span>
+                ) : (
+                  <span className="text-2xl" role="img" aria-label="UK Flag">🇬🇧</span>
+                )}
+              </button>
+
+              {showSettings && (
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-xl border border-slate-100 overflow-hidden py-2 z-50">
+                  <div className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t('nav.settings')}</div>
+
+                  <div className="px-4 py-2 hover:bg-slate-50 flex items-center justify-between cursor-pointer" onMouseDown={() => { setLanguage('id'); setShowSettings(false); }}>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xl">🇮🇩</span>
+                      <span className={`text-sm font-bold ${language === 'id' ? 'text-blue-600' : 'text-slate-700'}`}>Bahasa Indonesia</span>
+                    </div>
+                    {language === 'id' && <span className="w-2 h-2 rounded-full bg-blue-600"></span>}
+                  </div>
+
+                  <div className="px-4 py-2 hover:bg-slate-50 flex items-center justify-between cursor-pointer" onMouseDown={() => { setLanguage('en'); setShowSettings(false); }}>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xl">🇬🇧</span>
+                      <span className={`text-sm font-bold ${language === 'en' ? 'text-blue-600' : 'text-slate-700'}`}>English</span>
+                    </div>
+                    {language === 'en' && <span className="w-2 h-2 rounded-full bg-blue-600"></span>}
+                  </div>
+                </div>
+              )}
             </div>
 
             <button
               onClick={() => navigate('/contact')}
               className="hidden lg:block bg-[#020617] text-white px-5 py-2.5 rounded hover:bg-black transition-all shadow-lg active:scale-95 ml-2"
             >
-              Kontak Kami
+              {t('nav.contact')}
             </button>
           </div>
 
@@ -239,7 +279,7 @@ const Navbar: React.FC = () => {
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-[150] bg-white">
           <div className="p-5 flex flex-col h-full">
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-[#020617] rounded-full flex items-center justify-center">
                   <span className="text-white font-extrabold text-xs italic">Y</span>
@@ -253,6 +293,20 @@ const Navbar: React.FC = () => {
                 <svg className="w-6 h-6 text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
+
+            {/* Mobile Menu Search Bar */}
+            <form onSubmit={handleSearch} className="mb-8 relative">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={t('search.placeholder')}
+                className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium placeholder:text-slate-400"
+              />
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+              </div>
+            </form>
 
             <div className="flex flex-col gap-6 text-xl font-bold text-[#020617]">
               <Link to="/" onClick={() => setMobileMenuOpen(false)} className="border-b border-slate-100 pb-4">Home</Link>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../lib/supabaseClient';
 import { Property } from '../types';
 import CompactPropertyCard from '../components/CompactPropertyCard';
@@ -8,6 +9,7 @@ import CompactPropertyCard from '../components/CompactPropertyCard';
 const SpecialOffers: React.FC = () => {
     // const promoProperties = MOCK_PROPERTIES.filter(p => p.isPromo);
     const navigate = useNavigate();
+    const { t } = useLanguage();
     const [promoProperties, setPromoProperties] = useState<Property[]>([]);
 
     useEffect(() => {
@@ -55,10 +57,10 @@ const SpecialOffers: React.FC = () => {
             <div className="max-w-[1200px] mx-auto px-4 md:px-6">
                 <div className="mb-8">
                     <h1 className="text-2xl font-bold text-slate-800 mb-2">
-                        Rekomendasi Sesuai Pencarianmu
+                        {t('offers.title')}
                     </h1>
                     <p className="text-sm text-slate-500">
-                        Properti pilihan dengan penawaran terbaik minggu ini.
+                        {t('offers.subtitle')}
                     </p>
                 </div>
 
@@ -74,8 +76,8 @@ const SpecialOffers: React.FC = () => {
                     </div>
                 ) : (
                     <div className="py-20 text-center bg-white border border-slate-200 rounded-lg">
-                        <h3 className="text-lg font-bold text-slate-900 mb-2">Belum Ada Promo Saat Ini</h3>
-                        <p className="text-slate-500 text-sm">Silakan cek kembali nanti untuk penawaran menarik lainnya.</p>
+                        <h3 className="text-lg font-bold text-slate-900 mb-2">{t('offers.emptyTitle')}</h3>
+                        <p className="text-slate-500 text-sm">{t('offers.emptyText')}</p>
                     </div>
                 )}
             </div>

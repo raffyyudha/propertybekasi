@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const Articles: React.FC = () => {
     const [articles, setArticles] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const { t } = useLanguage();
 
     useEffect(() => {
         fetchArticles();
@@ -37,16 +39,16 @@ const Articles: React.FC = () => {
                 <div className="mb-20">
                     <div className="flex items-center gap-6 mb-10">
                         <span className="h-[1px] w-24 bg-emerald-500"></span>
-                        <span className="text-emerald-500 font-black uppercase tracking-[0.5em] text-[10px]">Insights & News</span>
+                        <span className="text-emerald-500 font-black uppercase tracking-[0.5em] text-[10px]">{t('articles.tagline')}</span>
                     </div>
                     <h2 className="text-6xl md:text-[90px] font-extrabold text-[#020617] leading-[0.85] tracking-tighter">
-                        LATEST <br />
-                        <span className="text-slate-200">ARTICLES.</span>
+                        {t('articles.title1')} <br />
+                        <span className="text-slate-200">{t('articles.title2')}</span>
                     </h2>
                 </div>
 
                 {loading ? (
-                    <div className="text-center py-20 text-slate-400 font-bold">Loading Articles...</div>
+                    <div className="text-center py-20 text-slate-400 font-bold">{t('articles.loading')}</div>
                 ) : articles.length > 0 ? (
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
                         {articles.map(article => (
@@ -65,13 +67,13 @@ const Articles: React.FC = () => {
                                 <div className="flex items-center gap-4 mb-4 text-xs font-bold text-slate-400 uppercase tracking-widest">
                                     <span>{formatDate(article.created_at)}</span>
                                     <span className="w-1 h-1 bg-emerald-500 rounded-full"></span>
-                                    <span>By {article.author || 'YeoboLand'}</span>
+                                    <span>{t('articles.by')} {article.author || 'YeoboLand'}</span>
                                 </div>
                                 <h3 className="text-2xl font-bold text-[#020617] leading-tight group-hover:text-emerald-500 transition-colors mb-4 line-clamp-2">
                                     {article.title}
                                 </h3>
                                 <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#020617] group-hover:gap-4 transition-all">
-                                    Read Article
+                                    {t('articles.readArticle')}
                                     <span className="h-[1px] w-8 bg-[#020617]"></span>
                                 </div>
                             </div>
@@ -79,8 +81,8 @@ const Articles: React.FC = () => {
                     </div>
                 ) : (
                     <div className="text-center py-20">
-                        <div className="text-6xl opacity-10 font-black mb-4">EMPTY</div>
-                        <p className="text-slate-500 font-bold">Belum ada artikel yang diterbitkan.</p>
+                        <div className="text-6xl opacity-10 font-black mb-4">{t('articles.emptyTitle')}</div>
+                        <p className="text-slate-500 font-bold">{t('articles.emptyText')}</p>
                     </div>
                 )}
             </div>

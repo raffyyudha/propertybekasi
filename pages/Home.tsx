@@ -1,6 +1,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useLanguage } from '../contexts/LanguageContext';
 import { Property, SearchFilters } from '../types';
 // import { MOCK_PROPERTIES } from '../constants'; // Deprecated
 import { supabase } from '../lib/supabaseClient';
@@ -12,6 +13,7 @@ import StoryFeed from '../components/StoryFeed';
 const Home: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { t } = useLanguage();
     const [filters, setFilters] = useState<SearchFilters>({
         query: '',
         type: '',
@@ -127,15 +129,15 @@ const Home: React.FC = () => {
                 ) : (
                     <div className="py-20 md:py-40 text-center bg-slate-50 architect-mask border-thin border-slate-100">
                         <div className="text-6xl md:text-[120px] font-black opacity-5 mb-8">EMPTY</div>
-                        <h3 className="text-xl md:text-3xl font-extrabold text-[#020617] mb-6 tracking-tight">Katalog Tidak Tersedia</h3>
+                        <h3 className="text-xl md:text-3xl font-extrabold text-[#020617] mb-6 tracking-tight">{t('home.emptyCatalog')}</h3>
                         <p className="text-slate-400 font-medium max-w-md mx-auto leading-relaxed mb-12 px-4">
-                            Inventory eksklusif kami untuk kriteria ini sedang kosong. Silakan atur ulang filter pencarian Anda.
+                            {t('home.emptyDescription')}
                         </p>
                         <button
                             onClick={() => setFilters({ query: '', type: '', minPrice: '', maxPrice: '' })}
                             className="bg-[#020617] text-white font-black text-[10px] uppercase tracking-widest px-14 py-6 rounded-full shadow-2xl transition-all active:scale-95"
                         >
-                            Tampilkan Semua Unit
+                            {t('home.showAll')}
                         </button>
                     </div>
                 )}
@@ -155,14 +157,14 @@ const Home: React.FC = () => {
                         <div>
                             <div className="flex items-center gap-6 mb-8 md:mb-12">
                                 <span className="h-[1px] w-20 bg-emerald-500"></span>
-                                <span className="text-emerald-500 font-black uppercase tracking-[0.5em] text-[10px]">The Platinum Standard</span>
+                                <span className="text-emerald-500 font-black uppercase tracking-[0.5em] text-[10px]">{t('home.platinumStandard')}</span>
                             </div>
                             <h2 className="text-3xl sm:text-5xl md:text-[90px] font-extrabold leading-[0.9] tracking-tighter mb-6 md:mb-16">
-                                BEYOND <br />
-                                THE <span className="text-slate-600">TRANSACTION.</span>
+                                {t('home.beyondTitle1')} <br />
+                                {t('home.beyondTitle2')} <span className="text-slate-600">{t('home.beyondTitle3')}</span>
                             </h2>
                             <p className="text-sm md:text-xl text-slate-400 font-medium max-w-xl leading-relaxed">
-                                Layanan kami melampaui jual-beli. Kami adalah konsultan strategis yang memastikan aset Anda memiliki nilai investasi jangka panjang yang aman.
+                                {t('home.beyondDescription')}
                             </p>
                         </div>
                         <div className="relative pt-20">
@@ -182,20 +184,20 @@ const Home: React.FC = () => {
                         {[
                             {
                                 id: '01',
-                                title: 'Precision Compliance',
-                                desc: 'Audit hukum menyeluruh untuk setiap sertifikat, IMB, dan PBB sebelum dipublikasikan.',
+                                title: t('home.feature1Title'),
+                                desc: t('home.feature1Desc'),
                                 icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z'
                             },
                             {
                                 id: '02',
-                                title: 'White-Glove Concierge',
-                                desc: 'Layanan penjemputan survei dan pendampingan notaris personal untuk kenyamanan Anda.',
+                                title: t('home.feature2Title'),
+                                desc: t('home.feature2Desc'),
                                 icon: 'M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7'
                             },
                             {
                                 id: '03',
-                                title: 'Market Intelligence',
-                                desc: 'Analisis data real-time mengenai tren harga properti di Bekasi untuk keputusan investasi tepat.',
+                                title: t('home.feature3Title'),
+                                desc: t('home.feature3Desc'),
                                 icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6'
                             }
                         ].map((item) => (
