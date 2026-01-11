@@ -133,12 +133,7 @@ const Hero: React.FC<HeroProps> = ({ filters, onSearch }) => {
         {/* Editorial Text Column - Swapped to 2nd Position */}
         <div className="lg:col-span-8 relative z-20 pt-10 md:pt-0 mt-0 lg:mt-0">
           <div className="reveal-up" style={{ animationDelay: '0.2s' }}>
-            {/* Top Gap Filler Poster - Hidden on Desktop, No Margin */}
-            <div className="w-full rounded-2xl overflow-hidden shadow-lg border border-slate-100 lg:hidden mb-0">
-              <img src="/promo-banner.png" alt="Promo Banner" className="w-full h-24 md:h-32 object-cover" />
-            </div>
-
-            <h1 className="text-4xl sm:text-6xl md:text-[90px] lg:text-[120px] xl:text-[140px] font-extrabold text-display mb-0 md:mb-12 text-[#020617] leading-[0.9] tracking-tight mt-1 md:mt-0">
+            <h1 className="text-4xl sm:text-6xl md:text-[90px] lg:text-[120px] xl:text-[140px] font-extrabold text-display mb-0 md:mb-12 text-[#020617] leading-[0.9] tracking-tight mt-0">
               {t('hero.architecting')} <br />
               <span className="text-slate-200">{t('hero.dreams')}</span> {t('hero.inBekasi')} <span className="text-emerald-500">.</span>
             </h1>
@@ -150,10 +145,7 @@ const Hero: React.FC<HeroProps> = ({ filters, onSearch }) => {
             </p>
           </div>
 
-          {/* Bottom Gap Filler Poster - Hidden on Desktop */}
-          <div className="w-full max-w-xl rounded-2xl overflow-hidden shadow-lg border border-slate-100 mb-10 lg:hidden mt-4">
-            <img src="/promo-banner.png" alt="Promo Banner" className="w-full h-24 md:h-32 object-cover" />
-          </div>
+
 
         </div>
 
