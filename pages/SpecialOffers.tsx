@@ -53,7 +53,7 @@ const SpecialOffers: React.FC = () => {
     // const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
 
     return (
-        <div className="pt-28 pb-40 min-h-screen bg-slate-50">
+        <div className="pt-36 md:pt-40 pb-40 min-h-screen bg-slate-50">
             <div className="max-w-[1200px] mx-auto px-4 md:px-6">
                 <div className="mb-8">
                     <h1 className="text-2xl font-bold text-slate-800 mb-2">

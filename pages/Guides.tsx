@@ -8,7 +8,7 @@ const Guides: React.FC = () => {
     const { t } = useLanguage();
 
     return (
-        <div className="pt-28 pb-20 min-h-screen bg-slate-50">
+        <div className="pt-36 md:pt-40 pb-20 min-h-screen bg-slate-50">
             <div className="max-w-[1200px] mx-auto px-4 md:px-6">
                 {/* Header */}
                 <div className="mb-12 text-center">

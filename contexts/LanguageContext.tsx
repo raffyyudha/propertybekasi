@@ -148,6 +148,37 @@ const translations = {
         'prop.reviews': 'Ulasan',
         'prop.noReviews': 'Belum ada ulasan untuk properti ini.',
         'prop.morePhotos': 'Foto Lainnya',
+
+        // Articles Page
+        'articles.tagline': 'ARTIKEL · TAGLINE',
+        'articles.title1': 'ARTIKEL',
+        'articles.title2': 'PROPERTI.',
+        'articles.loading': 'Memuat artikel...',
+        'articles.by': 'oleh',
+        'articles.readArticle': 'Baca Artikel',
+        'articles.emptyTitle': 'TIDAK ADA ARTIKEL',
+        'articles.emptyText': 'Belum ada artikel yang dipublikasikan.',
+
+        // Special Offers Page
+        'offers.title': 'Penawaran Khusus',
+        'offers.subtitle': 'Dapatkan properti impian dengan harga terbaik!',
+        'offers.emptyTitle': 'Belum Ada Penawaran',
+        'offers.emptyText': 'Saat ini belum ada properti dengan penawaran khusus.',
+
+        // Guides Page
+        'guides.title': 'Panduan Properti',
+        'guides.subtitle': 'Panduan lengkap untuk membantu Anda membeli, menjual, dan berinvestasi properti dengan cerdas.',
+        'guides.cat.all': 'Semua',
+        'guides.cat.buy': 'Beli Properti',
+        'guides.cat.sell': 'Jual Properti',
+        'guides.cat.kpr': 'KPR',
+        'guides.cat.legal': 'Legalitas',
+        'guides.cat.invest': 'Investasi',
+        'guides.cat.lifestyle': 'Lifestyle',
+        'guides.newsletterTitle': 'Dapatkan Tips Properti Terbaru',
+        'guides.newsletterText': 'Berlangganan newsletter kami untuk mendapatkan tips, tren, dan panduan properti terkini.',
+        'guides.emailPlaceholder': 'Email Anda',
+        'guides.subscribe': 'Berlangganan',
     },
     en: {
         // Navbar
@@ -288,6 +319,37 @@ const translations = {
         'prop.reviews': 'Reviews',
         'prop.noReviews': 'No reviews for this property yet.',
         'prop.morePhotos': 'More Photos',
+
+        // Articles Page
+        'articles.tagline': 'ARTICLES · TAGLINE',
+        'articles.title1': 'PROPERTY',
+        'articles.title2': 'ARTICLES.',
+        'articles.loading': 'Loading articles...',
+        'articles.by': 'by',
+        'articles.readArticle': 'Read Article',
+        'articles.emptyTitle': 'NO ARTICLES',
+        'articles.emptyText': 'No articles have been published yet.',
+
+        // Special Offers Page
+        'offers.title': 'Special Offers',
+        'offers.subtitle': 'Get your dream property at the best price!',
+        'offers.emptyTitle': 'No Offers Yet',
+        'offers.emptyText': 'There are currently no properties with special offers.',
+
+        // Guides Page
+        'guides.title': 'Property Guides',
+        'guides.subtitle': 'Complete guides to help you buy, sell, and invest in property smartly.',
+        'guides.cat.all': 'All',
+        'guides.cat.buy': 'Buy Property',
+        'guides.cat.sell': 'Sell Property',
+        'guides.cat.kpr': 'Mortgage',
+        'guides.cat.legal': 'Legal',
+        'guides.cat.invest': 'Investment',
+        'guides.cat.lifestyle': 'Lifestyle',
+        'guides.newsletterTitle': 'Get Latest Property Tips',
+        'guides.newsletterText': 'Subscribe to our newsletter to receive the latest property tips, trends, and guides.',
+        'guides.emailPlaceholder': 'Your Email',
+        'guides.subscribe': 'Subscribe',
     }
 };
 
